@@ -3,7 +3,7 @@ import { getSlots, reserveSlot, Slot } from './client';
 
 export class ReservationManager {
     private requests: ReservationRequest[] = [];
-    constructor(requests: ReservationRequest[]) {
+    constructor(requests?: ReservationRequest[]) {
         this.requests = requests;
     }
 
@@ -110,7 +110,7 @@ const doesSlotMeetConstraints = (
     return slotIsInWindow && slotIsRightSize;
 };
 
-type ReservationRequest = {
+export type ReservationRequest = {
     userId: string;
     venueId: string;
     keys: ResyKeys;
@@ -120,12 +120,12 @@ type ReservationRequest = {
     nextRetryTime: Date;
 };
 
-type SlotConstraints = {
+export type SlotConstraints = {
     windows: TimeWindow[];
     partySize: number;
 };
 
-type TimeWindow = {
+export type TimeWindow = {
     startTime: Date;
     endTime: Date;
 };

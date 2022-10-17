@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { router } from './router';
+import { ReservationManager } from './plan';
 
 const app = express();
 const port = 3000;
@@ -13,3 +14,6 @@ app.use('/', router);
 app.listen(port, () =>
     console.log(`Express is listening at http://localhost:${port}`),
 );
+
+// data structure to manage reservation requests
+export const reservationManager = new ReservationManager();

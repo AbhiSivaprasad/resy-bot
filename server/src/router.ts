@@ -1,5 +1,7 @@
 import express from 'express';
 import { ResyKeys } from './api';
+import { reservationManager } from './app';
+import { SlotConstraints, TimeWindow } from './plan';
 
 export const router = express.Router();
 
@@ -22,8 +24,15 @@ router.post('/user', async (req, res) => {
 });
 
 router.post('/reserve', async (req, res) => {
-    const { venue_id, user_id, slots, retry_interval_seconds } = req.body;
-    if (!venue_id || !user_id || !slots || !retry_interval_seconds) {
+    const { venue_id, user_id, slots, retry_interval_seconds, party_size } =
+        req.body;
+    if (
+        !venue_id ||
+        !user_id ||
+        !slots ||
+        !retry_interval_seconds ||
+        !party_size
+    ) {
         res.status(400).send('Missing required parameters');
         return;
     } else if (slots.length === 0) {
@@ -37,5 +46,40 @@ router.post('/reserve', async (req, res) => {
         res.status(400).send('Retry interval must be an integer > 1');
         return;
     }
-    res.send('bar');
+
+    if (
+        slots.some((slot) => {
+            !slot.date ||
+                !slot.party_size ||
+                !slot.start_time ||
+                !slot.end_time;
+        })
+    ) {
+        res.status(400).send('At least one slot missing required parameters');
+        return;
+    }
+    const windows = slots.map(
+        (slot): TimeWindow => ({
+            startTime: new Date(`${slot.date} ${slot.start_time}`),
+            endTime: new Date(`${slot.date} ${slot.end_time}`),
+        }),
+    );
+
+    const constraints: SlotConstraints = {
+        partySize: party_size,
+        windows,
+    };
+
+    reservationManager.addReservationRequest({
+        venueId: venue_id,
+        userId: user_id,
+        constraints,
+        retryIntervalSeconds: retry_interval_seconds,
+        keys: {
+            apiKey: keys.apiKey,
+            authToken: keys.authToken,
+        },
+        expirationTime: undefined,
+        nextRetryTime: new Date(), // try right away
+    });
 });
