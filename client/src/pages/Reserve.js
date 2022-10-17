@@ -39,6 +39,7 @@ function Reserve() {
   let [restaurantList, setRestaurantList] = useState([]);
   let [startTime, setStartTime] = useState(null);
   let [endTime, setEndTime] = useState(null);
+  let [partySize, setPartySize] = useState(2);
   let [dates, setDates] = useState([]);
   let [name, setName] = useState("");
   let [email, setEmail] = useState("");
@@ -46,7 +47,7 @@ function Reserve() {
   return (
     <div className="flex flex-col items-center">
       <div className="container flex flex-col items-center">
-        <div className="text-4xl">Let's make you a reservation!</div>
+        <div className="text-4xl my-8">Let's make you a reservation!</div>
         <ExpandableSection
           expandedStep={expandedStep}
           step={1}
@@ -86,7 +87,11 @@ function Reserve() {
             </div>
             <div>For a party of</div>
             <div className="max-w-54">
-              <Input value={2} numberRange={10} />
+              <Input
+                numberRange={10}
+                value={partySize}
+                onSelect={setPartySize}
+              />
             </div>
           </div>
         </ExpandableSection>
@@ -153,7 +158,15 @@ function Reserve() {
         </ExpandableSection>
         <Button
           onClick={() =>
-            console.log(restaurantList, startTime, endTime, dates, name, email)
+            console.log(
+              restaurantList,
+              partySize,
+              startTime,
+              endTime,
+              dates,
+              name,
+              email
+            )
           }
           className="my-2"
         >
