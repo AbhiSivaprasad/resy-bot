@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 const NavButton = (props) => (
-  <div class="p-4">
+  <div className="p-4">
     <Link to={props.to}>{props.text}</Link>
   </div>
 );
