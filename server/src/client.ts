@@ -1,4 +1,5 @@
-import {getVenueDetails, ResyKeys} from "./api";
+import moment from "moment";
+import {bookSlot, getSlotDetails, getVenueDetails, ResyKeys} from "./api";
 
 // get available slots for a venue
 export const getSlots = async (venueId: string, date: Date, partySize: number, keys: ResyKeys): Promise<Slot[]> => {
@@ -10,27 +11,55 @@ export const getSlots = async (venueId: string, date: Date, partySize: number, k
         throw new Error("Slots not found in API response");
     }
 
-    const processedSlots = slots.map((slot: any): Slot => {
-        return ({
-            id: slot.config.id,
-            type: slot.config.type,
-            startTime: slot.date.start,
-            endTime: slot.date.end,
-            minSize: slot.size.min,
-            maxSize: slot.size.max,
-            token: slot.config.token
-        });
-    });
+    const processedSlots = slots.map((slot): Slot => ({
+        id: slot.config.id,
+        type: slot.config.type,
+        startTime: moment(slot.date.start, "YYYY-MM-DD hh:mm:ss").toDate(),
+        endTime: moment(slot.date.end, "YYYY-MM-DD hh:mm:ss").toDate(),
+        size: Number(slot.size.max), // there is also a slot.size.min, unclear what this means
+        token: slot.config.token
+    }));
 
-    return slots;
+    return processedSlots;
 };
 
-type Slot = {
+export const reserveSlot = async (slot: Slot, keys: ResyKeys): Promise<BookResponse> => {
+    const bookingInfo = await getSlotBookingInfo(slot, keys);
+    const response = await bookSlot(bookingInfo.bookToken, keys);
+    if (response.reservation_id) {
+        return {
+            success: true,
+        };
+    } else {
+        throw new Error("Reservation ID not found in API response");
+    }
+};
+
+const getSlotBookingInfo = async (slot: Slot, keys: ResyKeys): Promise<SlotBookingInfo> => {
+    const response = await getSlotDetails(slot.token, slot.startTime, slot.size, keys); 
+    const bookToken = response?.book_token?.value;
+    if (bookToken) {
+        return {
+            bookToken,
+        };
+    } else {
+        throw new Error("Book token not found in API response");
+    }
+};
+
+export type Slot = {
     id: string;
     type: string;
     startTime: Date;
     endTime: Date;
-    minSize: number;
-    maxSize: number;
+    size: number;
     token: string;
+}
+
+type SlotBookingInfo = {
+    bookToken: string;
+}
+
+type BookResponse = {
+    success: boolean;
 }

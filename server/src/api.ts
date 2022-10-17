@@ -42,12 +42,9 @@ export const getSlotDetails = async (slotTokenId: string, date: Date, partySize:
     return response.data;
 };
     
-export const bookSlot = async (bookToken: string, paymentId: string, keys: ResyKeys) => {
+export const bookSlot = async (bookToken: string, keys: ResyKeys) => {
     const data = JSON.stringify({
         'book_token': bookToken,
-        'struct_payment_method': {
-            "id": paymentId
-        },
         'source_id': 'resy.com-venue-details' 
     });
     const config = {
@@ -64,15 +61,13 @@ export const bookSlot = async (bookToken: string, paymentId: string, keys: ResyK
     return response.data; 
 };
 
-const buildHeaders = (headers, keys: ResyKeys) => {
-    return {
-        ...headers,
-        ...{
-            'authorization': `ResyAPI api_key="${keys.apiKey}"`,
-            'x-resy-universal-auth': keys.authToken
-        }
-    };
-};
+const buildHeaders = (headers, keys: ResyKeys) => ({
+    ...headers,
+    ...{
+        'authorization': `ResyAPI api_key="${keys.apiKey}"`,
+        'x-resy-universal-auth': keys.authToken
+    }
+});
 
 export type ResyKeys = {
     apiKey: string;
