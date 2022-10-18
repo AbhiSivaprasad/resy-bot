@@ -1,5 +1,5 @@
-import moment from 'moment';
 import { bookSlot, getSlotDetails, getVenueDetails, ResyKeys } from './api';
+import { logger } from './app';
 
 // get available slots for a venue
 export const getSlots = async (
@@ -9,19 +9,18 @@ export const getSlots = async (
     keys: ResyKeys,
 ): Promise<Slot[]> => {
     const response = await getVenueDetails(venueId, date, partySize, keys);
-    const slots = response?.results?.venues[0]?.slots;
-    if (slots) {
-        console.log(slots);
-    } else {
-        throw new Error('Slots not found in API response');
+    let slots = response?.results?.venues[0]?.slots;
+    if (!slots) {
+        logger.log('Slots not found in API response');
+        slots = [];
     }
 
     const processedSlots = slots.map(
         (slot): Slot => ({
             id: slot.config.id,
             type: slot.config.type,
-            startTime: slot.date.start.toDate(),
-            endTime: slot.date.end.toDate(),
+            startTime: new Date(slot.date.start),
+            endTime: new Date(slot.date.end),
             size: Number(slot.size.max), // there is also a slot.size.min, unclear what this means
             token: slot.config.token,
         }),
@@ -40,8 +39,17 @@ export const reserveSlot = async (
         return {
             success: true,
         };
+    } else if (response.specs) {
+        // this means we are trying to book a slot we've already booked
+        logger.log('Already booked slot, but trying to book again.');
+        return {
+            success: true,
+        };
     } else {
-        throw new Error('Reservation ID not found in API response');
+        // failed to book slot
+        return {
+            success: false,
+        };
     }
 };
 

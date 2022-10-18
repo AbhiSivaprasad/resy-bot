@@ -1,10 +1,11 @@
 import { ResyKeys } from './api';
 import { getSlots, reserveSlot, Slot } from './client';
+import { logger } from './app';
 
 export class ReservationManager {
-    private requests: ReservationRequest[] = [];
+    private requests: ReservationRequest[];
     constructor(requests?: ReservationRequest[]) {
-        this.requests = requests;
+        this.requests = requests || [];
     }
 
     public addReservationRequest(request: ReservationRequest) {

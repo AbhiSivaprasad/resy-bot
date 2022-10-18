@@ -2,9 +2,11 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { router } from './router';
 import { ReservationManager } from './plan';
+import { Logger } from './logger';
 
 const app = express();
 const port = 3000;
+const logger = new Logger();
 
 // configure middleware
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -16,4 +18,12 @@ app.listen(port, () =>
 );
 
 // data structure to manage reservation requests
-export const reservationManager = new ReservationManager();
+const reservationManager = new ReservationManager();
+
+// run function every 5 seconds
+const secondsBetweenProcessingRequests = 3;
+setInterval(() => {
+    reservationManager.processRequests();
+}, secondsBetweenProcessingRequests * 1000);
+
+export { reservationManager, logger };

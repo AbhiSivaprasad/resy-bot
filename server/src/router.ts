@@ -70,7 +70,10 @@ router.post('/reserve', async (req, res) => {
         windows,
     };
 
-    reservationManager.addReservationRequest({
+    // by default expire the request after the last window
+    const expirationTime = new Date(Math.max(...windows.map((w) => w.endTime)));
+
+    const reservationRequest = {
         venueId: venue_id,
         userId: user_id,
         constraints,
@@ -79,7 +82,14 @@ router.post('/reserve', async (req, res) => {
             apiKey: keys.apiKey,
             authToken: keys.authToken,
         },
-        expirationTime: undefined,
+        expirationTime,
         nextRetryTime: new Date(), // try right away
+    };
+
+    reservationManager.addReservationRequest(reservationRequest);
+
+    // return success response
+    res.send({
+        status: 'success',
     });
 });
