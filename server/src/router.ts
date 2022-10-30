@@ -1,6 +1,8 @@
 import express from 'express';
 import { ResyKeys } from './api';
 import { reservationManager } from './app';
+import { updateUser } from './db/client';
+import { usersCollection } from './db/manager';
 import { SlotConstraints, TimeWindow } from './plan';
 
 export const router = express.Router();
@@ -16,13 +18,39 @@ router.get('/', async (req, res) => {
     res.send('foo');
 });
 
+/**
+ * GET /user
+ * Get user info given api key
+ */
+router.get('/user', async (req, res) => {
+    if (!req.query.user_id) {
+        res.status(400).send('User id is required');
+    }
+});
+
+/**
+ * POST /user
+ * Update a user's api key and auth token.
+ * If the user doesn't exist then return an error.
+ */
 router.post('/user', async (req, res) => {
     const { user_id, api_key, auth_token } = req.body;
 
-    // update api key and auth token in db
-    res.send('test');
+    // check that user exists
+    const success = updateUser(user_id, api_key, auth_token);
+
+    if (!success) {
+        res.status(404).send('User not found');
+        return;
+    }
+
+    res.send('success');
 });
 
+/**
+ * POST /reserve
+ * Submit a request for a reservation under supplied constraints
+ */
 router.post('/reserve', async (req, res) => {
     const { venue_id, user_id, slots, retry_interval_seconds, party_size } =
         req.body;
