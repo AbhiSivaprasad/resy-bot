@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import DatePicker from "react-multi-date-picker";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import DropdownList from "react-widgets/DropdownList";
 import "react-widgets/styles.css";
+import { UserContext } from "../App";
 
 const ExpandableSection = (props) => {
   let isExpanded = true;
@@ -28,12 +29,6 @@ const ExpandableSection = (props) => {
 
 function Reserve() {
   let [expandedStep, setExpandedStep] = useState(1);
-  const dummmyRestaurantList = [
-    { name: "Nice Restaurant", stars: 3 },
-    { name: "Nicer Restaurant", stars: 3 },
-    { name: "Nicest Restaurant", stars: 3 },
-  ];
-
   // form data
   let [restaurantList, setRestaurantList] = useState([]);
   let [startTime, setStartTime] = useState(null);
@@ -45,10 +40,23 @@ function Reserve() {
 
   let [venueSearchResults, setVenueSearchResults] = useState([]);
   let [venueSearchQuery, setVenueSearchQuery] = useState("");
+  const [user, setUser] = useContext(UserContext);
+  const [location, setLocation] = useState("");
+  console.log("USER IS", user);
+
+  useEffect(() => navigator.geolocation.getCurrentPosition(setLocation), []);
+
   useEffect(() => {
+    console.log("user is", user);
     let query = {
-      geo: { latitude: 40.7597, longitude: -73.981 },
+      geo: {
+        latitude: location?.coords?.latitude,
+        longitude: location?.coords?.longitude,
+      },
       per_page: 5,
+      party_size: 2,
+      api_key: user?.data?.api_key,
+      auth_token: user?.data?.auth_token,
       query: venueSearchQuery,
     };
     fetch(process.env.REACT_APP_SERVER_URL + "/search", {
@@ -156,7 +164,7 @@ function Reserve() {
             ></DatePicker>
           </div>
         </ExpandableSection>
-        <ExpandableSection
+        {/* <ExpandableSection
           expandedStep={expandedStep}
           step={3}
           classes="rounded-b-xl"
@@ -173,7 +181,7 @@ function Reserve() {
             <div className="whitespace-nowrap">and you can contact me by </div>
             <Input onChange={setEmail} placeholder="Email address..."></Input>
           </div>
-        </ExpandableSection>
+        </ExpandableSection> */}
         <Button
           onClick={() =>
             console.log(
