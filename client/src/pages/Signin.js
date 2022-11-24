@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Button from "../components/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/Input";
+import { UserContext } from "../App";
 
 function Step(props) {
   return (
@@ -14,15 +15,42 @@ function Step(props) {
   );
 }
 function Signin() {
+  const [user, setUser] = useContext(UserContext);
+  let navigate = useNavigate();
   let [apiKey, setApiKey] = useState("");
   let [authToken, setAuthToken] = useState("");
   let postUser = () => {
+    console.log({
+      user_id: user.data.userId,
+      resy_api_key: apiKey,
+      resy_auth_token: authToken,
+    });
     fetch(process.env.REACT_APP_SERVER_URL + "/user", {
       method: "POST",
-      body: { apiKey, authToken },
+      body: {
+        user_id: user.data.userId,
+        resy_api_key: apiKey,
+        resy_auth_token: authToken,
+      },
     })
-      .then((res) => res.json())
-      .then((res) => console.log(res));
+      .then((res) => res.text())
+      .then((res) => {
+        if (res == "success") {
+          fetch(
+            process.env.REACT_APP_SERVER_URL + "/user?user_id=" + user.userId
+          )
+            .then((res) => {
+              if (res.ok) return res.json();
+              else throw new Error("Status code error :" + res.status);
+            })
+            .then((data) => {
+              setUser({ ...user, data });
+              localStorage.setItem("username", user.userId);
+              navigate("/reservations");
+            });
+          navigate("/reservations");
+        }
+      });
   };
   return (
     <div className="flex flex-col items-center">

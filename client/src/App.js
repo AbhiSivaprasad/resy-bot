@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Home from "./pages/Home";
 import Reserve from "./pages/Reserve";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import Nav from "./components/Nav";
 import Signin from "./pages/Signin";
 import { useEffect } from "react";
@@ -10,13 +10,25 @@ const title = "Navigation Bar";
 export const UserContext = React.createContext("");
 function App() {
   const [user, setUser] = useState({});
+  const navigate = useNavigate();
   useEffect(() => {
-    if (navigator?.geolocation) {
-      navigator.geolocation.getCurrentPosition((location) => {
-        if (location) {
-          setUser({ ...user, location });
-        }
-      });
+    if (localStorage.getItem("username")) {
+      fetch(
+        process.env.REACT_APP_SERVER_URL +
+          "/user?user_id=" +
+          localStorage.getItem("username")
+      )
+        .then((res) => {
+          if (res.ok) return res.json();
+          else throw new Error("Status code error :" + res.status);
+        })
+        .then((data) => {
+          console.log("data is", data);
+          setUser({ ...user, data });
+          navigate("/reservations");
+        });
+    } else {
+      navigate("/");
     }
   }, []);
   return (
