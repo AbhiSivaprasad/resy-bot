@@ -10,7 +10,7 @@ const ExpandableSection = (props) => {
   let isExpanded = true;
   let header = (
     <div className="w-full flex flex-row items-center">
-      <div className="m-4 rounded-full text-white bg-red-500 w-10 p-4">
+      <div className="m-4  rounded-full text-white bg-red-500 w-10 p-4">
         {props.step}
       </div>
       {props.name}
@@ -51,7 +51,7 @@ function Reserve() {
       per_page: 5,
       query: venueSearchQuery,
     };
-    fetch("/search", {
+    fetch(process.env.REACT_APP_SERVER_URL + "/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       mode: "no-cors",

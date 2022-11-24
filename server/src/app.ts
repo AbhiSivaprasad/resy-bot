@@ -17,6 +17,9 @@ const logger = new Logger();
 // initialize db connection manager
 dbManager.init();
 
+var cors = require('cors');
+app.use(cors());
+
 // configure middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
