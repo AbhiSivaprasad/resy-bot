@@ -33,7 +33,7 @@ function Input(props) {
       />
       {selectOptions && focused && (
         <div className="absolute z-10 w-full rounded-3xl border top-0 pt-12">
-          <div className="bg-white  px-4">
+          <div className="bg-wseite  px-4">
             {selectOptions.map((item) => (
               <div
                 className="cursor-pointer border-b hover:bg-gray-200 duration-100"

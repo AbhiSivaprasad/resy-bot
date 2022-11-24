@@ -7,7 +7,6 @@ import DropdownList from "react-widgets/DropdownList";
 import "react-widgets/styles.css";
 
 const ExpandableSection = (props) => {
-  console.log("expanded step is", props.expandedStep, props.step);
   let isExpanded = true;
   let header = (
     <div className="w-full flex flex-row items-center">
@@ -44,6 +43,23 @@ function Reserve() {
   let [name, setName] = useState("");
   let [email, setEmail] = useState("");
 
+  let [venueSearchResults, setVenueSearchResults] = useState([]);
+  let [venueSearchQuery, setVenueSearchQuery] = useState("");
+  useEffect(() => {
+    let query = {
+      geo: { latitude: 40.7597, longitude: -73.981 },
+      per_page: 5,
+      query: venueSearchQuery,
+    };
+    fetch("/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      mode: "no-cors",
+      body: JSON.stringify(query),
+    })
+      .then((res) => res.json())
+      .then((res) => console.log(res));
+  }, [venueSearchQuery]);
   return (
     <div className="flex flex-col items-center">
       <div className="container flex flex-col items-center">
@@ -56,21 +72,23 @@ function Reserve() {
           name="Choose a set of restaurants & party size"
         >
           <div className="flex flex-col items-center">
-            <div class="mb-2">Find me restaruants at</div>
+            <div className="mb-2">Find me restaruants at</div>
             <Input
               className="w-96"
-              selectOptions={dummmyRestaurantList}
+              selectOptions={venueSearchResults}
+              value={venueSearchQuery}
+              onChange={setVenueSearchQuery}
               onSelect={(value) => {
                 console.log("added ", value);
                 setRestaurantList([...restaurantList, value]);
               }}
               placeholder="Start typing a restaurant name"
             ></Input>
-            <div class="p-4 flex flex-row space-x-2 flex-wrap">
+            <div className="p-4 flex flex-row space-x-2 flex-wrap">
               {restaurantList.map((restaurant) => (
                 <div
                   key={restaurant.name}
-                  class="flex flex-row align-center bg-red-500 py-1 px-2 rounded-md space-x-2"
+                  className="flex flex-row align-center bg-red-500 py-1 px-2 rounded-md space-x-2"
                 >
                   <div>{restaurant.name}</div>
                   <button
@@ -102,7 +120,7 @@ function Reserve() {
           name="Set some dates and times that you'd want to go"
         >
           <div className="flex flex-row items-center space-x-2">
-            <div class="whitespace-nowrap">Get me reservations between</div>
+            <div className="whitespace-nowrap">Get me reservations between</div>
             <Input
               onSelect={setStartTime}
               selectOptions={[
@@ -110,7 +128,7 @@ function Reserve() {
                 { name: "6pm", value: "6pm" },
               ]}
             ></Input>
-            <div class="whitespace-nowrap">and</div>
+            <div className="whitespace-nowrap">and</div>
 
             <Input
               onSelect={setEndTime}

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 function Home() {
   return (
-    <div className="flex flex-col flex-center">
+    <div className="flex flex-col items-center">
       <div className="container">
         <div className="h-96 flex flex-col items-center justify-center">
           <div className="text-center text-4xl">Welcome to resy bot.</div>
