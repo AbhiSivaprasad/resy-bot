@@ -1,7 +1,9 @@
 import express from 'express';
-import { ResyKeys } from './api';
-import { reservationManager } from './app';
-import { SlotConstraints, TimeWindow } from './plan';
+import { ResyKeys, search } from './external/api';
+import { getUser, updateUser } from './db/client';
+import { UnreachableCaseError } from './util';
+import { reserve } from './client';
+import { GeoLocation } from './external/types';
 
 export const router = express.Router();
 
@@ -12,22 +14,101 @@ const keys: ResyKeys = {
 };
 
 // add router in the Express app.
-router.get('/', async (req, res) => {
-    res.send('foo');
+/**
+ * GET /user
+ * @param user_id: string
+ * Get user info given user's id
+ */
+router.get('/user', async (req, res) => {
+    if (!req.query.user_id) {
+        res.status(400).send('User id is required');
+        return;
+    }
+    const result = await getUser(req.query.user_id as string);
+    if (result.err) {
+        const error = result.val;
+        switch (error) {
+            case 'USER_NOT_FOUND':
+                res.status(404).send('User not found');
+                return;
+            default:
+                throw new UnreachableCaseError(error);
+        }
+    } else {
+        res.send(result.val);
+    }
 });
 
+/**
+ * POST /search
+ * @param partySize: size of party to search for (probably just set to 1 for most flexibility)
+ * @param latitude: optional string user's latitude
+ * @param longitude: optional string user's longitude
+ * @param api_key: string
+ * @param auth_token: string
+ *
+ * Proxy to Resy's search endpoint
+ */
+router.post('/search', async (req, res) => {
+    const { party_size, latitude, longitude, api_key, auth_token } = req.body;
+
+    if (!api_key || !auth_token || !party_size) {
+        res.status(400).send('party_size, api_key, auth_token are required');
+        return;
+    }
+
+    const location: GeoLocation =
+        latitude && longitude ? { latitude, longitude } : undefined;
+
+    const searchResults = await search(
+        parseInt(party_size),
+        { apiKey: api_key, authToken: auth_token },
+        location,
+    );
+
+    res.send(searchResults);
+});
+
+/**
+ * POST /user
+ * @param user_id: string
+ * @param api_key: string
+ * @param auth_token: string
+ * Update a user's api key and auth token.
+ * If the user doesn't exist then return an error.
+ */
 router.post('/user', async (req, res) => {
     const { user_id, api_key, auth_token } = req.body;
 
-    // update api key and auth token in db
-    res.send('test');
+    const result = await updateUser(user_id, api_key, auth_token);
+    if (result.err) {
+        const error = result.val;
+        switch (error) {
+            case 'USER_NOT_FOUND':
+                res.status(404).send('User not found');
+                break;
+            default:
+                throw new UnreachableCaseError(error);
+        }
+    } else {
+        res.send('success');
+    }
 });
 
+/**
+ * POST /reserve
+ * @param venue_id: string
+ * @param user_id: string
+ * @param slots: SlotConstraints[]
+ * @param retry_interval_seconds: number
+ * @param party_size: number
+ * Submit a request for a reservation under supplied constraints
+ */
 router.post('/reserve', async (req, res) => {
-    const { venue_id, user_id, slots, retry_interval_seconds, party_size } =
+    const { venue_ids, user_id, slots, retry_interval_seconds, party_size } =
         req.body;
     if (
-        !venue_id ||
+        !venue_ids ||
         !user_id ||
         !slots ||
         !retry_interval_seconds ||
@@ -37,6 +118,9 @@ router.post('/reserve', async (req, res) => {
         return;
     } else if (slots.length === 0) {
         res.status(400).send('No slots provided');
+        return;
+    } else if (venue_ids.length === 0) {
+        res.status(400).send('No venues provided');
         return;
     } else if (
         !Number.isFinite(retry_interval_seconds) ||
@@ -58,35 +142,15 @@ router.post('/reserve', async (req, res) => {
         res.status(400).send('At least one slot missing required parameters');
         return;
     }
-    const windows = slots.map(
-        (slot): TimeWindow => ({
-            startTime: new Date(`${slot.date} ${slot.start_time}`),
-            endTime: new Date(`${slot.date} ${slot.end_time}`),
-        }),
+
+    const result = await reserve(
+        venue_ids,
+        user_id,
+        retry_interval_seconds,
+        party_size,
+        slots,
+        keys,
     );
-
-    const constraints: SlotConstraints = {
-        partySize: party_size,
-        windows,
-    };
-
-    // by default expire the request after the last window
-    const expirationTime = new Date(Math.max(...windows.map((w) => w.endTime)));
-
-    const reservationRequest = {
-        venueId: venue_id,
-        userId: user_id,
-        constraints,
-        retryIntervalSeconds: retry_interval_seconds,
-        keys: {
-            apiKey: keys.apiKey,
-            authToken: keys.authToken,
-        },
-        expirationTime,
-        nextRetryTime: new Date(), // try right away
-    };
-
-    reservationManager.addReservationRequest(reservationRequest);
 
     // return success response
     res.send({
