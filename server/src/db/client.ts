@@ -47,6 +47,23 @@ export const getUser = async (
     return Ok(user);
 };
 
+export const getUserActiveReservations = async (
+    userId: string,
+): Promise<Result<Reservation[], GetUserErrors>> => {
+    const user = <User>(
+        await (await usersCollection()).findOne({ userId: userId })
+    );
+
+    if (!user) {
+        return Err('USER_NOT_FOUND');
+    }
+    const reservations = (await (await reservationsCollection())
+        .find({ userId: userId })
+        .toArray()) as Reservation[];
+
+    return Ok(reservations);
+};
+
 export const getUserActiveReservationCount = async (
     userId: string,
 ): Promise<number> => {

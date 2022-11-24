@@ -1,6 +1,11 @@
 import express from 'express';
 import { ResyKeys, search } from './external/api';
-import { getUser, updateUser } from './db/client';
+import {
+    getActiveReservations,
+    getUser,
+    getUserActiveReservations,
+    updateUser,
+} from './db/client';
 import { UnreachableCaseError } from './util';
 import { reserve } from './client';
 import { GeoLocation } from './external/types';
@@ -156,4 +161,30 @@ router.post('/reserve', async (req, res) => {
     res.send({
         status: 'success',
     });
+});
+
+/**
+ * GET /requests
+ * @param user_id: string
+ * Get all active requests for a user
+ */
+router.get('/requests', async (req, res) => {
+    if (!req.query.user_id) {
+        res.status(400).send('User id is required');
+        return;
+    }
+
+    const result = await getUserActiveReservations(req.query.user_id as string);
+    if (result.err) {
+        const error = result.val;
+        switch (error) {
+            case 'USER_NOT_FOUND':
+                res.status(404).send('User not found');
+                return;
+            default:
+                throw new UnreachableCaseError(error);
+        }
+    } else {
+        res.send(result.val);
+    }
 });

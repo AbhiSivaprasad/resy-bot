@@ -16,6 +16,7 @@ export type Reservation = {
     expirationTime: Date;
     retryIntervalSeconds: number;
     nextRetryTime: Date;
+    complete: boolean;
 };
 
 export type ReservationRequest = Reservation & {
