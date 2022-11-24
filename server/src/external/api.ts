@@ -1,5 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
+import { GeoLocation } from './types';
 
 export const getVenueDetails = async (
     venueId: string,
@@ -79,6 +80,42 @@ export const bookSlot = async (bookToken: string, keys: ResyKeys) => {
 
     // the server returns 412 but the request is successful so use the error response
     const response = await axios(config).catch((error) => error.response);
+    return response.data;
+};
+
+export const search = async (
+    partySize: number,
+    keys: ResyKeys,
+    location?: GeoLocation,
+) => {
+    const data = JSON.stringify({
+        ...(location && {
+            geo: {
+                latitude: location.latitude,
+                longitude: location.longitude,
+            },
+        }),
+        per_page: 5,
+        query: 'by',
+        slot_filter: {
+            day: new Date().toISOString().substring(0, 10),
+            party_size: partySize,
+        },
+        types: ['venue', 'cuisine'],
+    });
+
+    const config = {
+        method: 'post',
+        url: '/3/venuesearch/search',
+        baseURL: 'https://api.resy.com/',
+        headers: {
+            'content-type': 'application/json',
+            authorization: `ResyAPI api_key="${keys.apiKey}"`,
+        },
+        data: data,
+    };
+
+    const response = await axios(config);
     return response.data;
 };
 

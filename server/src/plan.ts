@@ -1,15 +1,21 @@
-import { ResyKeys } from './api';
-import { getSlots, reserveSlot, Slot } from './client';
-import { logger } from './app';
+import { getActiveReservations } from './db/client';
+import { Reservation, SlotConstraints } from './db/types';
+import { ResyKeys } from './external/api';
+import { getSlots, reserveSlot } from './external/client';
+import { Slot } from './external/types';
 
-export class ReservationManager {
+export class ReservationRequestManager {
     private requests: ReservationRequest[];
     constructor(requests?: ReservationRequest[]) {
         this.requests = requests || [];
     }
 
-    public addReservationRequest(request: ReservationRequest) {
-        this.requests.push(request);
+    public async loadActiveRequestsFromDb() {
+        this.requests = await getActiveReservations();
+    }
+
+    public addReservationRequests(requests: ReservationRequest[]) {
+        this.requests.push(...requests);
     }
 
     public processRequests() {
@@ -40,7 +46,7 @@ export class ReservationManager {
     }
 
     private async processRequest(request: ReservationRequest) {
-        const slotToReserve = await findSuitableReservation(
+        const slotToReserve = await this.findSuitableReservationRequest(
             request.venueId,
             request.constraints,
             request.keys,
@@ -57,76 +63,60 @@ export class ReservationManager {
         return false;
     }
 
-    private requestStillValid(request: ReservationRequest) {
+    private requestStillValid(request: Reservation) {
         return request.expirationTime.valueOf() >= new Date().valueOf();
     }
+
+    private findSuitableReservationRequest = async (
+        venueId: string,
+        constraints: SlotConstraints,
+        keys: ResyKeys,
+    ): Promise<Slot | undefined> => {
+        // find all unique dates we need to check for available reservations
+        // remove dates in the past (we may have been trying to snipe for multiple days)
+        const allowedDates = [
+            ...new Set(
+                constraints.windows.map((window) =>
+                    window.startTime.toISOString().substring(0, 10),
+                ),
+            ),
+        ].map((date) => new Date(date));
+
+        // return the first slot that meets the constraints to minimize api calls
+        let slotToReserve = undefined;
+        for (const date of allowedDates) {
+            const slots = await getSlots(
+                venueId,
+                date,
+                constraints.partySize,
+                keys,
+            );
+            const suitableSlots = slots.filter((slot) =>
+                this.doesSlotMeetConstraints(slot, constraints),
+            );
+            if (suitableSlots.length > 0) {
+                slotToReserve = suitableSlots[0];
+                break;
+            }
+        }
+
+        return slotToReserve;
+    };
+
+    private doesSlotMeetConstraints = (
+        slot: Slot,
+        constraints: SlotConstraints,
+    ): boolean => {
+        const slotIsInWindow = constraints.windows.some(
+            (window) =>
+                slot.startTime >= window.startTime &&
+                slot.startTime <= window.endTime,
+        );
+        const slotIsRightSize = slot.size == constraints.partySize;
+        return slotIsInWindow && slotIsRightSize;
+    };
 }
 
-export const findSuitableReservation = async (
-    venueId: string,
-    constraints: SlotConstraints,
-    keys: ResyKeys,
-): Promise<Slot | undefined> => {
-    // find all unique dates we need to check for available reservations
-    // remove dates in the past (we may have been trying to snipe for multiple days)
-    const allowedDates = [
-        ...new Set(
-            constraints.windows.map((window) =>
-                window.startTime.toISOString().substring(0, 10),
-            ),
-        ),
-    ].map((date) => new Date(date));
-
-    // return the first slot that meets the constraints to minimize api calls
-    let slotToReserve = undefined;
-    for (const date of allowedDates) {
-        const slots = await getSlots(
-            venueId,
-            date,
-            constraints.partySize,
-            keys,
-        );
-        const suitableSlots = slots.filter((slot) =>
-            doesSlotMeetConstraints(slot, constraints),
-        );
-        if (suitableSlots.length > 0) {
-            slotToReserve = suitableSlots[0];
-            break;
-        }
-    }
-
-    return slotToReserve;
-};
-
-const doesSlotMeetConstraints = (
-    slot: Slot,
-    constraints: SlotConstraints,
-): boolean => {
-    const slotIsInWindow = constraints.windows.some(
-        (window) =>
-            slot.startTime >= window.startTime &&
-            slot.startTime <= window.endTime,
-    );
-    const slotIsRightSize = slot.size == constraints.partySize;
-    return slotIsInWindow && slotIsRightSize;
-};
-
-export type ReservationRequest = {
-    userId: string;
-    venueId: string;
+type ReservationRequest = Reservation & {
     keys: ResyKeys;
-    constraints: SlotConstraints;
-    expirationTime: Date;
-    retryIntervalSeconds: number;
-    nextRetryTime: Date;
-};
-
-export type SlotConstraints = {
-    windows: TimeWindow[];
-    partySize: number;
-};
-
-export type TimeWindow = {
-    startTime: Date;
-    endTime: Date;
 };
