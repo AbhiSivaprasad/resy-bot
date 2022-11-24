@@ -32,15 +32,15 @@ function Input(props) {
         className="border-2 px-4 py-2 rounded-full w-full"
       />
       {selectOptions && focused && (
-        <div className="absolute z-10 w-full rounded-3xl border top-0 pt-12">
-          <div className="bg-wseite  px-4">
+        <div className="absolute z-10 w-full rounded-3xl overflow-hidden border top-0 pt-12">
+          <div className="bg-white">
             {selectOptions.map((item) => (
               <div
                 className="cursor-pointer border-b hover:bg-gray-200 duration-100"
                 key={item.name}
                 onClick={() => selectHandler(item)}
               >
-                {item.name}
+                <div className="px-4">{item.name}</div>
               </div>
             ))}
           </div>

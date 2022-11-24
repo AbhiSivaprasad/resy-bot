@@ -10,6 +10,7 @@ function Nav() {
   let nav = [
     { to: "/", text: "Home" },
     { to: "/reserve", text: "Reserve" },
+    { to: "/reservations", text: "My Reservations" },
   ];
   return (
     <div className="container">
