@@ -20,24 +20,25 @@ function Signin() {
   let [apiKey, setApiKey] = useState("");
   let [authToken, setAuthToken] = useState("");
   let postUser = () => {
-    console.log({
-      user_id: user.data.userId,
-      resy_api_key: apiKey,
-      resy_auth_token: authToken,
-    });
     fetch(process.env.REACT_APP_SERVER_URL + "/user", {
-      method: "POST",
-      body: {
-        user_id: user.data.userId,
-        resy_api_key: apiKey,
-        resy_auth_token: authToken,
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
       },
+      body: JSON.stringify({
+        user_id: user.data.userId,
+        api_key: apiKey,
+        auth_token: authToken,
+      }),
     })
       .then((res) => res.text())
       .then((res) => {
         if (res == "success") {
           fetch(
-            process.env.REACT_APP_SERVER_URL + "/user?user_id=" + user.userId
+            process.env.REACT_APP_SERVER_URL +
+              "/user?user_id=" +
+              user.data.userId
           )
             .then((res) => {
               if (res.ok) return res.json();
@@ -45,7 +46,7 @@ function Signin() {
             })
             .then((data) => {
               setUser({ ...user, data });
-              localStorage.setItem("username", user.userId);
+              localStorage.setItem("username", user.data.userId);
               navigate("/reservations");
             });
           navigate("/reservations");

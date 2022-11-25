@@ -6,6 +6,7 @@ import { Reservation, ReservationRequest, User } from './types';
 
 type UpdateUserErrors = 'USER_NOT_FOUND';
 type GetUserErrors = 'USER_NOT_FOUND';
+type DeleteReservationErrors = 'RESERVATION_NOT_FOUND';
 
 export const updateUser = async (
     userId: string,
@@ -17,7 +18,6 @@ export const updateUser = async (
     if (!user) {
         return Err('USER_NOT_FOUND');
     }
-
     await (
         await usersCollection()
     ).updateOne(
@@ -55,6 +55,24 @@ export const getUserActiveReservationCount = async (
     ).countDocuments({ userId: userId, expirationTime: { $gt: new Date() } });
 
     return reservationCount;
+};
+
+export const getUserActiveReservations = async (
+    userId: string,
+): Promise<ReservationRequest[]> => {
+    const reservations = (await (await reservationsCollection())
+        .find({ userId: userId, expirationTime: { $gt: new Date() } })
+        .toArray()) as ReservationRequest[];
+
+    return reservations;
+};
+
+export const deleteReservation = async (
+    reservationId: string,
+): Promise<void> => {
+    const deleted = await (
+        await reservationsCollection()
+    ).deleteOne({ _id: reservationId });
 };
 
 export const insertUserReservations = async (

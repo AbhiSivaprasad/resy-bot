@@ -16,6 +16,7 @@ export const getSlots = async (
     keys: ResyKeys,
 ): Promise<Slot[]> => {
     const response = await getVenueDetails(venueId, date, partySize, keys);
+    console.log('response was ', response);
     let slots = response?.results?.venues[0]?.slots;
     if (!slots) {
         logger.log('Slots not found in API response');
@@ -83,5 +84,6 @@ const getSlotBookingInfo = async (
 export const searchResults = async (
     partySize: number,
     keys: ResyKeys,
+    query,
     location?: GeoLocation,
-) => await search(partySize, keys, location);
+) => await search(partySize, keys, query, location);

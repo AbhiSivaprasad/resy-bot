@@ -22,7 +22,12 @@ function Home() {
         setUser({ ...user, data });
         localStorage.setItem("username", username);
         // likely haven't set this correctly
-        if (data.api_key.length < 10 || data.auth_token.length < 50) {
+        if (
+          !data.api_key ||
+          !data.auth_token ||
+          data.api_key.length < 10 ||
+          data.auth_token.length < 50
+        ) {
           navigate("/signin");
         } else {
           navigate("/reservations");
@@ -39,11 +44,16 @@ function Home() {
             A project by Abhi Sivaprasad and Shaya Zarkesh
           </div>
           <div>Enter your username below...</div>
-          <Input onChange={setUsername}></Input>
+          <Input className="w-64 my-2" onChange={setUsername}></Input>
           {usernameError && (
             <div className="text-white p-2 bg-red-300 m-2">{usernameError}</div>
           )}
-          <Button disabled={!username} onClick={attemptSignIn} color="red">
+          <Button
+            disabled={!username}
+            onClick={attemptSignIn}
+            color="red"
+            className="w-48 my-2"
+          >
             Sign In
           </Button>
         </div>

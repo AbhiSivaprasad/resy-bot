@@ -6,6 +6,7 @@ import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import DropdownList from "react-widgets/DropdownList";
 import "react-widgets/styles.css";
 import { UserContext } from "../App";
+import { useNavigate } from "react-router-dom";
 
 const ExpandableSection = (props) => {
   let isExpanded = true;
@@ -28,9 +29,10 @@ const ExpandableSection = (props) => {
 };
 
 function Reserve() {
+  let navigate = useNavigate();
   let [expandedStep, setExpandedStep] = useState(1);
   // form data
-  let [restaurantList, setRestaurantList] = useState([]);
+  let [selectedVenue, setSelectedVenue] = useState([]);
   let [startTime, setStartTime] = useState(null);
   let [endTime, setEndTime] = useState(null);
   let [partySize, setPartySize] = useState(2);
@@ -42,12 +44,15 @@ function Reserve() {
   let [venueSearchQuery, setVenueSearchQuery] = useState("");
   const [user, setUser] = useContext(UserContext);
   const [location, setLocation] = useState("");
-  console.log("USER IS", user);
 
   useEffect(() => navigator.geolocation.getCurrentPosition(setLocation), []);
 
   useEffect(() => {
-    console.log("user is", user);
+    if (venueSearchQuery.length == 0) {
+      console.log("setting empty searchresults");
+      setVenueSearchResults([]);
+      return;
+    }
     let query = {
       geo: {
         latitude: location?.coords?.latitude,
@@ -62,12 +67,41 @@ function Reserve() {
     fetch(process.env.REACT_APP_SERVER_URL + "/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      mode: "no-cors",
       body: JSON.stringify(query),
     })
       .then((res) => res.json())
-      .then((res) => console.log(res));
+      .then((res) => setVenueSearchResults(res?.search?.hits));
   }, [venueSearchQuery]);
+
+  let reserve = () => {
+    fetch(process.env.REACT_APP_SERVER_URL + "/reserve", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        user_id: user.data.userId,
+        venue_ids: [selectedVenue.objectID],
+        retry_interval_seconds: 10,
+        party_size: partySize,
+        slots: dates.map((date) => ({
+          date: date.year + "-" + date.monthIndex + "-" + date.day,
+          start_time: startTime.value,
+          end_time: endTime.value,
+        })),
+        api_key: user.data.api_key,
+        auth_token: user.data.auth_token,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.status == "success") {
+          navigate("/reservations");
+        }
+      });
+  };
+
   return (
     <div className="flex flex-col items-center">
       <div className="container flex flex-col items-center">
@@ -83,16 +117,14 @@ function Reserve() {
             <div className="mb-2">Find me restaruants at</div>
             <Input
               className="w-96"
-              selectOptions={venueSearchResults}
+              options={venueSearchResults}
               value={venueSearchQuery}
               onChange={setVenueSearchQuery}
-              onSelect={(value) => {
-                console.log("added ", value);
-                setRestaurantList([...restaurantList, value]);
-              }}
+              optionType="venue"
+              onSelect={setSelectedVenue}
               placeholder="Start typing a restaurant name"
             ></Input>
-            <div className="p-4 flex flex-row space-x-2 flex-wrap">
+            {/* <div className="p-4 flex flex-row space-x-2 flex-wrap">
               {restaurantList.map((restaurant) => (
                 <div
                   key={restaurant.name}
@@ -110,14 +142,10 @@ function Reserve() {
                   </button>
                 </div>
               ))}
-            </div>
+            </div> */}
             <div>For a party of</div>
             <div className="max-w-54">
-              <Input
-                numberRange={10}
-                value={partySize}
-                onSelect={setPartySize}
-              />
+              <Input numberRange={10} onSelect={setPartySize} />
             </div>
           </div>
         </ExpandableSection>
@@ -127,24 +155,28 @@ function Reserve() {
           setExpandedStep={setExpandedStep}
           name="Set some dates and times that you'd want to go"
         >
-          <div className="flex flex-row items-center space-x-2">
+          <div className="flex flex-col lg:flex-row items-center space-x-2">
             <div className="whitespace-nowrap">Get me reservations between</div>
-            <Input
-              onSelect={setStartTime}
-              selectOptions={[
-                { name: "5pm", value: "5pm" },
-                { name: "6pm", value: "6pm" },
-              ]}
-            ></Input>
-            <div className="whitespace-nowrap">and</div>
+            <div className="flex flex-row items-center space-x-4">
+              <Input
+                className="w-32"
+                onSelect={setStartTime}
+                options={[
+                  { name: "5pm", value: "05:00" },
+                  { name: "6pm", value: "06:00" },
+                ]}
+              ></Input>
+              <div className="whitespace-nowrap">and</div>
 
-            <Input
-              onSelect={setEndTime}
-              selectOptions={[
-                { name: "5pm", value: "5pm" },
-                { name: "6pm", value: "6pm" },
-              ]}
-            ></Input>
+              <Input
+                className="w-32"
+                onSelect={setEndTime}
+                options={[
+                  { name: "5pm", value: "05:00" },
+                  { name: "6pm", value: "06:00" },
+                ]}
+              ></Input>
+            </div>
             <div className="whitespace-nowrap">on these days:</div>
             <DatePicker
               defaultValue={new Date()}
@@ -154,10 +186,11 @@ function Reserve() {
               multiple
               plugins={[<DatePanel sort="date" />]}
               style={{
+                flexGrow: 1,
                 height: "3em",
                 borderRadius: "8px",
                 fontSize: "17px",
-                minWidth: "500px",
+                width: "100%",
                 padding: "3px 10px",
               }}
               numberOfMonths={1}
@@ -183,17 +216,15 @@ function Reserve() {
           </div>
         </ExpandableSection> */}
         <Button
-          onClick={() =>
-            console.log(
-              restaurantList,
-              partySize,
-              startTime,
-              endTime,
-              dates,
-              name,
-              email
-            )
+          disabled={
+            !partySize ||
+            !startTime ||
+            !endTime ||
+            !dates ||
+            !dates.length ||
+            !selectedVenue
           }
+          onClick={reserve}
           className="my-2"
         >
           Notify me when you have reserved!

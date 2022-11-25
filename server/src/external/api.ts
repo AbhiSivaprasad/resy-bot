@@ -86,6 +86,7 @@ export const bookSlot = async (bookToken: string, keys: ResyKeys) => {
 export const search = async (
     partySize: number,
     keys: ResyKeys,
+    query: string,
     location?: GeoLocation,
 ) => {
     const data = JSON.stringify({
@@ -96,7 +97,7 @@ export const search = async (
             },
         }),
         per_page: 5,
-        query: 'by',
+        query: query,
         slot_filter: {
             day: new Date().toISOString().substring(0, 10),
             party_size: partySize,

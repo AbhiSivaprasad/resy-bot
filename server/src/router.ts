@@ -1,6 +1,12 @@
 import express from 'express';
 import { ResyKeys, search } from './external/api';
-import { getUser, updateUser } from './db/client';
+import {
+    deleteReservation,
+    getActiveReservations,
+    getUser,
+    getUserActiveReservations,
+    updateUser,
+} from './db/client';
 import { UnreachableCaseError } from './util';
 import { reserve } from './client';
 import { GeoLocation } from './external/types';
@@ -50,7 +56,8 @@ router.get('/user', async (req, res) => {
  * Proxy to Resy's search endpoint
  */
 router.post('/search', async (req, res) => {
-    const { party_size, latitude, longitude, api_key, auth_token } = req.body;
+    const { party_size, latitude, longitude, api_key, auth_token, query } =
+        req.body;
 
     if (!api_key || !auth_token || !party_size) {
         res.status(400).send('party_size, api_key, auth_token are required');
@@ -63,6 +70,7 @@ router.post('/search', async (req, res) => {
     const searchResults = await search(
         parseInt(party_size),
         { apiKey: api_key, authToken: auth_token },
+        query,
         location,
     );
 
@@ -147,8 +155,8 @@ router.post('/reserve', async (req, res) => {
         venue_ids,
         user_id,
         retry_interval_seconds,
-        party_size,
         slots,
+        party_size,
         keys,
     );
 
@@ -156,4 +164,32 @@ router.post('/reserve', async (req, res) => {
     res.send({
         status: 'success',
     });
+});
+
+/**
+ * GET /reservation
+ * @param user_id: string
+ * Get user info given user's id
+ */
+router.get('/reservation', async (req, res) => {
+    if (!req.query.user_id) {
+        res.status(400).send('User id is required');
+        return;
+    }
+    const result = await getUserActiveReservations(req.query.user_id as string);
+    res.send(result);
+});
+
+/**
+ * DELETE /reservation
+ * @param user_id: string
+ * Get user info given user's id
+ */
+router.delete('/reservation', async (req, res) => {
+    if (!req.query.user_id) {
+        res.status(400).send('User id is required');
+        return;
+    }
+    const result = await deleteReservation(req.query.reservation_id as string);
+    res.send(result);
 });
