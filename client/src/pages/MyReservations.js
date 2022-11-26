@@ -14,7 +14,7 @@ function MyReservations() {
     if (user?.data?.userId) {
       fetch(
         process.env.REACT_APP_SERVER_URL +
-          "/reservation?user_id=" +
+          "/requests?user_id=" +
           user?.data?.userId
       )
         .then((res) => res.json())
@@ -28,40 +28,53 @@ function MyReservations() {
   let [requestToBeDeleted, setRequestToBeDeleted] = useState(null);
 
   let deleteRequest = () => {
+    let temp = requestToBeDeleted;
     setRequestToBeDeleted(null);
-    let id = fetch(process.env.REACT_APP_SERVER_URL + "/request", {
-      mode: "DELETE",
-      credentials: "include",
-    })
-      .then((res) => res.json())
+    let id = fetch(
+      process.env.REACT_APP_SERVER_URL +
+        "/request?reservation_id=" +
+        requestToBeDeleted,
+      {
+        method: "DELETE",
+      }
+    )
+      .then((res) => res.text())
       .then((res) => {
-        console.log("delete response was", res);
         setPendingRequests(
-          pendingRequests.filter((request) => request.request_id != id)
+          pendingRequests.filter((request) => request._id != temp)
         );
       });
   };
+
+  let timeString = (time) =>
+    time.toLocaleTimeString("en-us", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
 
   let displayRequest = (request) => (
     <div
       key={request.reservation_id}
       className="w-full border border-gray-100 p-4"
     >
-      <div className="flex flex-row items-center w-full">
+      <div className="flex flex-row items-center w-full space-x-4">
         <div className="flex-grow">
           <div className="flex flex-row items-center space-x-4">
             <div>Venue: {request.venueId}</div>
-            <div>Expires at: {request.expirationTime}</div>
           </div>
-          {request.slots &&
-            request.slots
-              .map(
-                (slot) =>
-                  `On ${slot.date} bewteen ${slot.start_time} and ${slot.end_time}`
-              )
+          {request.constraints?.windows &&
+            request.constraints.windows
+              .map((slot) => {
+                let startTime = new Date(slot.startTime);
+                return `On ${startTime.toLocaleDateString(
+                  "en-us"
+                )} bewteen ${timeString(startTime)} and ${timeString(
+                  new Date(slot.endTime)
+                )}`;
+              })
               .join(", ")}
         </div>
-        <Button onClick={() => setRequestToBeDeleted(request.reservation_id)}>
+        <Button onClick={() => setRequestToBeDeleted(request._id)}>
           Remove
         </Button>
       </div>
@@ -79,7 +92,7 @@ function MyReservations() {
       <div className="flex flex-col items-center ">
         <div className="container flex flex-col">
           <div className="text-xl m-4 mt-10  font-semibold">
-            Pending Reservation Requests
+            Pending Reservation Requests ({pendingRequests.length})
           </div>
           {pendingRequests.map(displayRequest)}
           <div className="w-full flex justify-center my-8">

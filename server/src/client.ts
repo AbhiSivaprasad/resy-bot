@@ -40,8 +40,8 @@ export const reserve = async (
 
     const windows = slots.map(
         (slot): TimeWindow => ({
-            startTime: new Date(`${slot.date} ${slot.start_time}`),
-            endTime: new Date(`${slot.date} ${slot.end_time}`),
+            startTime: new Date(`${slot.date}T${slot.start_time}`),
+            endTime: new Date(`${slot.date}T${slot.end_time}`),
         }),
     );
 
@@ -50,7 +50,13 @@ export const reserve = async (
         windows,
     };
 
-    // by default expire the request after the last window
+    console.log(
+        'end time is',
+        slots[0].date,
+        slots[0].end_time,
+        windows[0].endTime,
+    );
+    // by   fault expire the request after the last window
     const expirationTime = new Date(Math.max(...windows.map((w) => w.endTime)));
 
     const reservationRequests: ReservationRequest[] = venue_ids.map(

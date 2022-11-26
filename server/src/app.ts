@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import { router } from './router';
@@ -16,8 +17,6 @@ const logger = new Logger();
 
 // initialize db connection manager
 dbManager.init();
-
-var cors = require('cors');
 app.use(cors());
 
 // configure middleware
@@ -35,7 +34,6 @@ const reservationManager = new ReservationRequestManager();
 //     await reservationManager.loadActiveRequestsFromDb();
 // })();
 
-// run function every 5 seconds
 const secondsBetweenProcessingRequests = 3;
 setInterval(() => {
     reservationManager.processRequests();

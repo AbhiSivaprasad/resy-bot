@@ -8,6 +8,14 @@ import "react-widgets/styles.css";
 import { UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
 
+const TIME_OPTIONS = Array(96)
+  .fill(0)
+  .map((_, i) => i)
+  .map((i) => Math.floor(i / 4) + ":" + String((i % 4) * 15).padStart(2, "0"))
+  .map((i) => ({ name: i, value: i }));
+
+const MAX_VENUES_PER_REQUEST = 5;
+
 const ExpandableSection = (props) => {
   let isExpanded = true;
   let header = (
@@ -37,8 +45,9 @@ function Reserve() {
   let [endTime, setEndTime] = useState(null);
   let [partySize, setPartySize] = useState(2);
   let [dates, setDates] = useState([]);
-  let [name, setName] = useState("");
-  let [email, setEmail] = useState("");
+  let [venues, setVenues] = useState([]);
+  // let [name, setName] = useState("");
+  // let [email, setEmail] = useState("");
 
   let [venueSearchResults, setVenueSearchResults] = useState([]);
   let [venueSearchQuery, setVenueSearchQuery] = useState("");
@@ -49,7 +58,6 @@ function Reserve() {
 
   useEffect(() => {
     if (venueSearchQuery.length == 0) {
-      console.log("setting empty searchresults");
       setVenueSearchResults([]);
       return;
     }
@@ -78,7 +86,6 @@ function Reserve() {
       method: "post",
       headers: {
         "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: JSON.stringify({
         user_id: user.data.userId,
@@ -86,7 +93,12 @@ function Reserve() {
         retry_interval_seconds: 10,
         party_size: partySize,
         slots: dates.map((date) => ({
-          date: date.year + "-" + date.monthIndex + "-" + date.day,
+          date:
+            date.year +
+            "-" +
+            String(date.monthIndex).padStart(2, "0") +
+            "-" +
+            String(date.day).padStart(2, "0"),
           start_time: startTime.value,
           end_time: endTime.value,
         })),
@@ -109,41 +121,50 @@ function Reserve() {
         <ExpandableSection
           expandedStep={expandedStep}
           step={1}
-          classes="rounded-t-xl"
+          classes="rounded-t-xl border-b-white"
           setExpandedStep={setExpandedStep}
           name="Choose a set of restaurants & party size"
         >
           <div className="flex flex-col items-center">
-            <div className="mb-2">Find me restaruants at</div>
+            <div className="mb-2">Find me reservations at one of:</div>
             <Input
               className="w-96"
+              resetAfterSelection
+              autoFocus
               options={venueSearchResults}
               value={venueSearchQuery}
               onChange={setVenueSearchQuery}
               optionType="venue"
-              onSelect={setSelectedVenue}
-              placeholder="Start typing a restaurant name"
+              onSelect={(venue) => {
+                setVenues([...venues, venue]);
+                setVenueSearchResults([]);
+              }}
+              placeholder={
+                venues.length >= MAX_VENUES_PER_REQUEST
+                  ? `Limit ${MAX_VENUES_PER_REQUEST} restaurants per request.`
+                  : "Start typing a restaurant name"
+              }
+              disabled={venues.length >= MAX_VENUES_PER_REQUEST}
             ></Input>
-            {/* <div className="p-4 flex flex-row space-x-2 flex-wrap">
-              {restaurantList.map((restaurant) => (
+            <div className="p-4 flex flex-row space-x-2 flex-wrap text-white">
+              {venues.map((venue) => (
                 <div
-                  key={restaurant.name}
-                  className="flex flex-row align-center bg-red-500 py-1 px-2 rounded-md space-x-2"
+                  key={venue.name}
+                  className="flex flex-row align-center bg-red-500 rounded-md space-x-2"
                 >
-                  <div>{restaurant.name}</div>
+                  <div className="py-1 pl-2">{venue.name}</div>
                   <button
+                    className="py-1 pr-2"
                     onClick={() =>
-                      setRestaurantList(
-                        restaurantList.filter((r) => r.name != restaurant.name)
-                      )
+                      setVenues(venues.filter((v) => v.name != venue.name))
                     }
                   >
                     x
                   </button>
                 </div>
               ))}
-            </div> */}
-            <div>For a party of</div>
+            </div>
+            <div className="mt-4">For a party of</div>
             <div className="max-w-54">
               <Input numberRange={10} onSelect={setPartySize} />
             </div>
@@ -161,20 +182,14 @@ function Reserve() {
               <Input
                 className="w-32"
                 onSelect={setStartTime}
-                options={[
-                  { name: "5pm", value: "05:00" },
-                  { name: "6pm", value: "06:00" },
-                ]}
+                options={TIME_OPTIONS}
               ></Input>
               <div className="whitespace-nowrap">and</div>
 
               <Input
                 className="w-32"
                 onSelect={setEndTime}
-                options={[
-                  { name: "5pm", value: "05:00" },
-                  { name: "6pm", value: "06:00" },
-                ]}
+                options={TIME_OPTIONS}
               ></Input>
             </div>
             <div className="whitespace-nowrap">on these days:</div>
@@ -225,7 +240,8 @@ function Reserve() {
             !selectedVenue
           }
           onClick={reserve}
-          className="my-2"
+          className="my-8"
+          buttonClasses="rounded-full px-8 py-4 font-bold"
         >
           Notify me when you have reserved!
         </Button>

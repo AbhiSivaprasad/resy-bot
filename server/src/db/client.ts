@@ -1,5 +1,6 @@
 import { ObjectID } from 'bson';
 import { Ok, Err, Result } from 'ts-results';
+import { reservationManager } from '../app';
 import { RESERVATION_COLLECTION_NAME } from './constants';
 import { reservationsCollection, usersCollection } from './manager';
 import { Reservation, ReservationRequest, User } from './types';
@@ -47,6 +48,23 @@ export const getUser = async (
     return Ok(user);
 };
 
+export const getUserActiveReservations = async (
+    userId: string,
+): Promise<Result<Reservation[], GetUserErrors>> => {
+    const user = <User>(
+        await (await usersCollection()).findOne({ userId: userId })
+    );
+
+    if (!user) {
+        return Err('USER_NOT_FOUND');
+    }
+    const reservations = (await (await reservationsCollection())
+        .find({ userId: userId })
+        .toArray()) as Reservation[];
+
+    return Ok(reservations);
+};
+
 export const getUserActiveReservationCount = async (
     userId: string,
 ): Promise<number> => {
@@ -57,22 +75,14 @@ export const getUserActiveReservationCount = async (
     return reservationCount;
 };
 
-export const getUserActiveReservations = async (
-    userId: string,
-): Promise<ReservationRequest[]> => {
-    const reservations = (await (await reservationsCollection())
-        .find({ userId: userId, expirationTime: { $gt: new Date() } })
-        .toArray()) as ReservationRequest[];
-
-    return reservations;
-};
-
 export const deleteReservation = async (
     reservationId: string,
-): Promise<void> => {
+): Promise<any> => {
     const deleted = await (
         await reservationsCollection()
-    ).deleteOne({ _id: reservationId });
+    ).deleteOne({ _id: new ObjectID(reservationId) });
+    reservationManager.removeReservationRequest(reservationId);
+    return deleted;
 };
 
 export const insertUserReservations = async (

@@ -44,7 +44,12 @@ function Home() {
             A project by Abhi Sivaprasad and Shaya Zarkesh
           </div>
           <div>Enter your username below...</div>
-          <Input className="w-64 my-2" onChange={setUsername}></Input>
+          <Input
+            className="w-64 my-2"
+            onChange={setUsername}
+            onEnter={attemptSignIn}
+            autoFocus
+          ></Input>
           {usernameError && (
             <div className="text-white p-2 bg-red-300 m-2">{usernameError}</div>
           )}

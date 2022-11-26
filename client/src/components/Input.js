@@ -16,8 +16,7 @@ function Input(props) {
     : props.options;
   let [focused, setFocused] = useState(false);
   let selectResultHandler = (item) => {
-    console.log("setting value to ", item.name);
-    setValue(item.name);
+    setValue(props.resetAfterSelection ? "" : item.name);
     setFocused(false);
     if (props.onSelect) props.onSelect(item);
   };
@@ -30,17 +29,26 @@ function Input(props) {
     if (props.optionType == "venue") {
       return (
         <div
-          className="cursor-pointer border-b hover:bg-gray-200 duration-100 flex flex-row items-center"
+          className="cursor-pointer border-b hover:bg-gray-200 duration-100 flex flex-row items-center pr-4"
           key={item.name}
           onClick={() => selectResultHandler(item)}
         >
-          <img className="w-12 h-12" src={item.images[0]} />
-          <div className="mx-2">
+          <img
+            className="w-12 h-12"
+            src={item.images?.length > 0 && item.images[0]}
+          />
+          <div className="mx-2 flex-grow">
             <div>{item.name}</div>
             <div className="text-sm text-gray-500">{item.cuisine}</div>
           </div>
           <div>
-            <div onClick={(e) => openResySlug(e, item.url_slug)}>go</div>
+            <div onClick={(e) => openResySlug(e, item.url_slug)}>
+              <img
+                width="40px"
+                height="20px"
+                src="https://upload.wikimedia.org/wikipedia/commons/4/43/Resy_logo.svg"
+              />
+            </div>
           </div>
         </div>
       );
@@ -51,7 +59,7 @@ function Input(props) {
           key={item.name}
           onClick={() => selectResultHandler(item)}
         >
-          <div className="px-4">{item.name}</div>
+          <div className="px-4 py-2">{item.name}</div>
         </div>
       );
     }
@@ -60,15 +68,25 @@ function Input(props) {
   return (
     <div className={`w-full relative ${props.className}`}>
       <input
+        autoFocus={props.autoFocus}
         placeholder={props.placeholder}
         onChange={changeHandler}
+        onKeyDown={(event) => {
+          if (event.key == "Enter" && props.onEnter) {
+            props.onEnter();
+          }
+        }}
         value={value}
+        disabled={props.disabled}
         onFocus={() => setFocused(true)}
         onBlur={() => setTimeout(() => setFocused(false), 200)}
         className="border-2 px-4 py-2 rounded-full w-full"
       />
-      {options && focused && (
-        <div className="absolute z-10 w-full rounded-3xl overflow-hidden border top-0 pt-12">
+      {options && options.length > 0 && focused && (
+        <div
+          className="absolute z-10 w-full rounded-b-3xl border top-10 overflow-y-scroll"
+          style={{ maxHeight: "300px" }}
+        >
           <div className="bg-white">{options.map(displayResultHandler)}</div>
         </div>
       )}

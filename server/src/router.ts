@@ -167,17 +167,29 @@ router.post('/reserve', async (req, res) => {
 });
 
 /**
- * GET /reservation
+ * GET /requests
  * @param user_id: string
- * Get user info given user's id
+ * Get all active requests for a user
  */
-router.get('/reservation', async (req, res) => {
+router.get('/requests', async (req, res) => {
     if (!req.query.user_id) {
         res.status(400).send('User id is required');
         return;
     }
+
     const result = await getUserActiveReservations(req.query.user_id as string);
-    res.send(result);
+    if (result.err) {
+        const error = result.val;
+        switch (error) {
+            case 'USER_NOT_FOUND':
+                res.status(404).send('User not found');
+                return;
+            default:
+                throw new UnreachableCaseError(error);
+        }
+    } else {
+        res.send(result.val);
+    }
 });
 
 /**
@@ -185,11 +197,17 @@ router.get('/reservation', async (req, res) => {
  * @param user_id: string
  * Get user info given user's id
  */
-router.delete('/reservation', async (req, res) => {
-    if (!req.query.user_id) {
-        res.status(400).send('User id is required');
+router.delete('/request', async (req, res) => {
+    if (!req.query.reservation_id) {
+        res.status(400).send('Reservation id is required');
         return;
     }
     const result = await deleteReservation(req.query.reservation_id as string);
-    res.send(result);
+    console.log(
+        'result is',
+        result,
+        'reservation is is',
+        req.query.reservation_id,
+    );
+    res.send('success');
 });

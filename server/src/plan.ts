@@ -15,7 +15,16 @@ export class ReservationRequestManager {
     }
 
     public addReservationRequests(requests: ReservationRequest[]) {
+        console.log('pushing', requests);
         this.requests.push(...requests);
+    }
+
+    public removeReservationRequest(request_id) {
+        console.log('length is', this.requests.length);
+        this.requests = this.requests.filter(
+            (request) => request._id != request_id,
+        );
+        console.log('length is', this.requests.length);
     }
 
     public processRequests() {
@@ -28,6 +37,10 @@ export class ReservationRequestManager {
                     const reservationSuccessful = this.processRequest(request);
                     if (reservationSuccessful) {
                         // remove request if the reservation was successful
+                        console.log(
+                            'successful reservation for ',
+                            request.userId,
+                        );
                         this.requests.splice(i, 1);
                     } else {
                         // if the reservation was not successful, schedule a retry
@@ -40,6 +53,7 @@ export class ReservationRequestManager {
                 }
             } else {
                 // remove request if reservation was unsuccessful but expriation time has passed
+                console.log('expiration time passed, removing');
                 this.requests.splice(i, 1);
             }
         }
