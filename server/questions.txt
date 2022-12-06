@@ -1,0 +1,17 @@
+1. I export an actual logging instance from the Logger class. This is nice because I don't have to pass the Logging class
+everywhere and I can instead query the global instance. 
+  - I export the global instance from a separate file so only nothing extra is imported on use (I used to export it from ./app.ts which is a mistake)
+
+2. There's a question of how to structure integration vs. unit tests. Here, I chose to make my integration tests at the client level instead of api.
+The API is not public facing and subject to change unpredictably so I want to test only for the parts of it that I use. 
+
+3. getSlotBookingInfo, I pass an entire slot but only a few properties are needed. It makes this more annoying to test but perhaps more logical.
+What's the best design choice here?
+
+4. Testing was super annoying. I wanted to test reserving in a separate test suite since I didn't want to spam book everytime I ran jest. Didn't see
+a good way to do this.
+
+5. Error handling. When I hit an error, I'll log all the error's information to a global service at the point of the error. I'll return an error type that
+has just enough information for the parent to handle and not propagate details like a trace.
+
+6. How to structure utils? For example, axios req/res logging for tests
