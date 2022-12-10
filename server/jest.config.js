@@ -4,4 +4,5 @@ module.exports = {
     testRegex: '/tests/.*\\.(test|spec)?\\.(ts|tsx)$',
     moduleFileExtensions: ['ts', 'js', 'json', 'node'],
     globalSetup: './src/jest/setup.js',
+    testTimeout: 8000,
 };

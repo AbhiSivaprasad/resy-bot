@@ -1,5 +1,5 @@
 dotenv = require('dotenv');
 
-module.exports = function (globalConfig, projectConfig) {
+module.exports = async function (globalConfig, projectConfig) {
     dotenv.config({ path: './.env.dev' });
 };

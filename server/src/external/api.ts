@@ -2,6 +2,8 @@ import axios, { AxiosResponse } from 'axios';
 import qs from 'qs';
 import { GeoLocation } from './types';
 
+export const RESY_API_URL = 'https://api.resy.com/';
+
 export const getVenueDetails = async (
     venueId: string,
     date: Date,
@@ -11,7 +13,7 @@ export const getVenueDetails = async (
     const config = {
         method: 'get',
         url: '/4/find',
-        baseURL: 'https://api.resy.com/',
+        baseURL: RESY_API_URL,
         params: {
             lat: '0', // latitude and longitude seem unnecessary
             long: '0',
@@ -47,7 +49,7 @@ export const getSlotDetails = async (
     const config = {
         method: 'post',
         url: '/3/details',
-        baseURL: 'https://api.resy.com/',
+        baseURL: RESY_API_URL,
         headers: buildHeaders(
             {
                 'content-type': 'application/json',
@@ -70,7 +72,7 @@ export const bookSlot = async (bookToken: string, keys: ResyKeys) => {
     const config = {
         method: 'post',
         url: '/3/book',
-        baseURL: 'https://api.resy.com/',
+        baseURL: RESY_API_URL,
         headers: buildHeaders(
             {
                 'content-type': 'application/x-www-form-urlencoded',
@@ -110,7 +112,7 @@ export const search = async (
     const config = {
         method: 'post',
         url: '/3/venuesearch/search',
-        baseURL: 'https://api.resy.com/',
+        baseURL: RESY_API_URL,
         headers: {
             'content-type': 'application/json',
             authorization: `ResyAPI api_key="${keys.apiKey}"`,

@@ -1,35 +1,19 @@
-import * as mongoDB from 'mongodb';
-import { logger } from '../app';
-import { RESERVATION_COLLECTION_NAME, USER_COLLECTION_NAME } from './constants';
+import mongoose from 'mongoose';
 
-export class dbManager {
-    static db: Promise<mongoDB.Db>;
+export const connect = async () => {
+    console.log('hi');
+    mongoose.set('strictQuery', true);
 
-    static init() {
-        this.db = this.connectToDatabase();
-    }
+    const uri = process.env.DB_CONN_STRING;
 
-    static async connectToDatabase() {
-        const client: mongoDB.MongoClient = new mongoDB.MongoClient(
-            process.env.DB_CONN_STRING,
-        );
+    await mongoose.connect(uri);
 
-        await client.connect();
+    // listen to connection for errors and log them
+    mongoose.connection.on('error', (err) => {
+        console.log(err);
+    });
+};
 
-        const db: mongoDB.Db = client.db(process.env.DB_NAME);
-
-        logger.log(`Successfully connected to database: ${db.databaseName}`);
-
-        return db;
-    }
-}
-
-export async function usersCollection() {
-    const db = await dbManager.db;
-    return db.collection(USER_COLLECTION_NAME);
-}
-
-export async function reservationsCollection() {
-    const db = await dbManager.db;
-    return db.collection(RESERVATION_COLLECTION_NAME);
-}
+export const disconnect = async () => {
+    mongoose.connection.close();
+};
