@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import qs from 'qs';
 import { GeoLocation } from './types';
 
@@ -24,9 +24,10 @@ export const getVenueDetails = async (
                 accept: 'application/json, text/plain, */*',
             },
             keys,
+            false,
         ),
     };
-    const response = await axios(config);
+    const response: AxiosResponse = await axios(config);
     return response.data;
 };
 
@@ -52,6 +53,7 @@ export const getSlotDetails = async (
                 'content-type': 'application/json',
             },
             keys,
+            false,
         ),
         data: data,
     };
@@ -120,12 +122,12 @@ export const search = async (
     return response.data;
 };
 
-const buildHeaders = (headers, keys: ResyKeys) => ({
+const buildHeaders = (headers, keys: ResyKeys, authtoken = true) => ({
     ...headers,
     ...{
         authorization: `ResyAPI api_key="${keys.apiKey}"`,
-        'x-resy-universal-auth': keys.authToken,
     },
+    ...(authtoken && { 'x-resy-universal-auth': keys.authToken }),
 });
 
 export type ResyKeys = {

@@ -3,7 +3,6 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import { router } from './router';
-import { Logger } from './logger';
 import { dbManager } from './db/manager';
 import { ReservationRequestManager } from './plan';
 
@@ -13,7 +12,6 @@ dotenv.config({ path: './.env.dev' });
 // initialize server
 const app = express();
 const port = 4000;
-const logger = new Logger();
 
 // initialize db connection manager
 dbManager.init();
@@ -39,4 +37,4 @@ setInterval(() => {
     reservationManager.processRequests();
 }, secondsBetweenProcessingRequests * 1000);
 
-export { reservationManager, logger };
+export { reservationManager };

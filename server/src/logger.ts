@@ -3,3 +3,5 @@ export class Logger {
         console.log(message);
     }
 }
+
+export const logger = new Logger();

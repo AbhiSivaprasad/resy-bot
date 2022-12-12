@@ -5,8 +5,9 @@ import {
     ResyKeys,
     search,
 } from './api';
-import { logger } from '../app';
+import { logger } from '../logger';
 import { BookResponse, GeoLocation, Slot, SlotBookingInfo } from './types';
+import { Err, Ok, Result } from 'ts-results';
 
 // get available slots for a venue
 export const getSlots = async (
@@ -16,7 +17,6 @@ export const getSlots = async (
     keys: ResyKeys,
 ): Promise<Slot[]> => {
     const response = await getVenueDetails(venueId, date, partySize, keys);
-    console.log('response was ', response);
     let slots = response?.results?.venues[0]?.slots;
     if (!slots) {
         logger.log('Slots not found in API response');
@@ -37,31 +37,26 @@ export const getSlots = async (
     return processedSlots;
 };
 
+type ReserveSlotErrors = 'SLOT_ALREADY_BOOKED' | 'FAILED_TO_BOOK_SLOT';
+
 export const reserveSlot = async (
     slot: Slot,
     keys: ResyKeys,
-): Promise<BookResponse> => {
+): Promise<Result<void, ReserveSlotErrors>> => {
     const bookingInfo = await getSlotBookingInfo(slot, keys);
     const response = await bookSlot(bookingInfo.bookToken, keys);
     if (response.reservation_id) {
-        return {
-            success: true,
-        };
+        return Ok(undefined);
     } else if (response.specs) {
-        // this means we are trying to book a slot we've already booked
-        logger.log('Already booked slot, but trying to book again.');
-        return {
-            success: true,
-        };
+        // we are trying to book a slot we've already booked
+        return Err('SLOT_ALREADY_BOOKED');
     } else {
         // failed to book slot
-        return {
-            success: false,
-        };
+        return Err('FAILED_TO_BOOK_SLOT');
     }
 };
 
-const getSlotBookingInfo = async (
+export const getSlotBookingInfo = async (
     slot: Slot,
     keys: ResyKeys,
 ): Promise<SlotBookingInfo> => {
