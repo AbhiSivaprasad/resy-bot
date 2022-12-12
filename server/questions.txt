@@ -15,3 +15,15 @@ a good way to do this.
 has just enough information for the parent to handle and not propagate details like a trace.
 
 6. How to structure utils? For example, axios req/res logging for tests
+
+7. API testing. There's some code that parses and validates API inputs, and some code that executes business logic. What's the value of unit vs. integration
+testing here? I don't think the integration test wins much here, so I unit tested both pieces. The annoying thing is the "business logic" for something like a
+/GET user endpoint is a single ORM call. How do you test your usage of that? What you really want is an integration test on the ORM call, so my solution was to
+move it to the db layer. Maybe this gives up too much flexibility if you put all ORM usage in the db layer?
+
+After talking this through with Alok, I think you don't win much to testing UserModel.findOne, but you lose a lot of flexibility. A middleground could be using the 
+db layer for complex ORM usages. Also, if you want to get coverage of these simple ORM calls then you can run integration tests at the router layer. 
+
+8. File naming is hard...
+
+9. Why isn't my mongoose type safety working?

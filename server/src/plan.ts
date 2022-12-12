@@ -1,4 +1,3 @@
-import { getActiveReservations } from './db/client';
 import { Reservation, SlotConstraints } from './db/types';
 import { ResyKeys } from './external/api';
 import { getSlots, reserveSlot } from './external/client';
@@ -11,7 +10,7 @@ export class ReservationRequestManager {
     }
 
     public async loadActiveRequestsFromDb() {
-        this.requests = await getActiveReservations();
+        // this.requests = await getActiveReservations();
     }
 
     public addReservationRequests(requests: ReservationRequest[]) {
@@ -68,10 +67,10 @@ export class ReservationRequestManager {
 
         if (slotToReserve) {
             const response = await reserveSlot(slotToReserve, request.keys);
-            if (response.success) {
-                console.log('Successfully reserved slot');
-                return true;
-            }
+            // if (response.success) {
+            // console.log('Successfully reserved slot');
+            // return true;
+            // }
         }
 
         return false;
