@@ -60,11 +60,7 @@ function Signin() {
         <div>
           <Step num={1}>
             Go to{" "}
-            <a
-              className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-              target={"_blank"}
-              href="https://resy.com"
-            >
+            <a className="a" target={"_blank"} href="https://resy.com">
               https://resy.com
             </a>{" "}
             and make sure you're signed in.
