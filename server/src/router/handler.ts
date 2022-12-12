@@ -1,5 +1,7 @@
 import { UserModel } from '../db/models/user/user.model';
 import { IUserDocument } from '../db/models/user/user.types';
+import { search } from '../external/api';
+import { GeoLocation } from '../external/types';
 
 export async function getUser(username: string) {
     const user: IUserDocument = await UserModel.findOne({ username: username });
@@ -46,4 +48,23 @@ export async function deleteUser(username: string) {
     const result = await UserModel.deleteOne({ username: username });
 
     return result.deletedCount != 0;
+}
+
+export async function getSearch(
+    party_size: number,
+    latitude: string,
+    longitude: string,
+    api_key: string,
+    auth_token: string,
+    query: string,
+) {
+    const location: GeoLocation =
+        latitude && longitude ? { latitude, longitude } : undefined;
+
+    return await search(
+        party_size,
+        { apiKey: api_key, authToken: auth_token },
+        query,
+        location,
+    );
 }

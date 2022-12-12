@@ -1,6 +1,9 @@
-import { deleteUser, getUser, postUser, putUser } from './handler';
+import { search } from '../external/api';
+import { GeoLocation } from '../external/types';
+import { deleteUser, getSearch, getUser, postUser, putUser } from './handler';
 import {
     validateDeleteUser,
+    validateGetSearchEndpoint,
     validateGetUser,
     validatePostUser,
     validatePutUser,
@@ -64,4 +67,25 @@ export async function deleteUserEndpoint(req, res) {
     } else {
         res.status(200).send('Update successful');
     }
+}
+
+export async function getSearchEndpoint(req, res) {
+    const result = validateGetSearchEndpoint(req);
+    if (result.err) {
+        res.status(400).send(result.val);
+    }
+
+    const { party_size, latitude, longitude, api_key, auth_token, query } =
+        req.body;
+
+    const searchResults = await getSearch(
+        parseInt(party_size),
+        latitude,
+        longitude,
+        api_key,
+        auth_token,
+        query,
+    );
+
+    res.send(searchResults);
 }

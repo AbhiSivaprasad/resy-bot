@@ -2,6 +2,7 @@ import express from 'express';
 import { ResyKeys } from '../external/api';
 import {
     deleteUserEndpoint,
+    getSearchEndpoint,
     getUserEndpoint,
     postUserEndpoint,
     putUserEndpoint,
@@ -50,37 +51,17 @@ router.put('/user', putUserEndpoint);
  */
 router.delete('/user', deleteUserEndpoint);
 
-// /**
-// * POST /search
-// * @param partySize: size of party to search for (probably just set to 1 for most flexibility)
-// * @param latitude: optional string user's latitude
-// * @param longitude: optional string user's longitude
-// * @param api_key: string
-// * @param auth_token: string
-// *
-// * Proxy to Resy's search endpoint
-// */
-// router.post('/search', async (req, res) => {
-// const { party_size, latitude, longitude, api_key, auth_token, query } =
-// req.body;
-
-// if (!api_key || !auth_token || !party_size) {
-// res.status(400).send('party_size, api_key, auth_token are required');
-// return;
-// }
-
-// const location: GeoLocation =
-// latitude && longitude ? { latitude, longitude } : undefined;
-
-// const searchResults = await search(
-// parseInt(party_size),
-// { apiKey: api_key, authToken: auth_token },
-// query,
-// location,
-// );
-
-// res.send(searchResults);
-// });
+/**
+ * POST /search
+ * @param partySize: size of party to search for (probably just set to 1 for most flexibility)
+ * @param latitude: optional string user's latitude
+ * @param longitude: optional string user's longitude
+ * @param api_key: string
+ * @param auth_token: string
+ *
+ * Proxy to Resy's search endpoint
+ */
+router.post('/search', getSearchEndpoint);
 
 // /**
 // * POST /reserve

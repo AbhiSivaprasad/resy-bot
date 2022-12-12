@@ -5,6 +5,11 @@ import supertest from 'supertest';
 import { connect, disconnect } from '../../src/db/manager';
 
 // write a test for the router
+const keys = {
+    apiKey: process.env.TEST_APIKEY,
+    authToken: process.env.TEST_AUTHTOKEN,
+};
+
 describe('testing router', () => {
     beforeAll(async () => {
         await connect();
@@ -57,5 +62,17 @@ describe('testing router', () => {
 
         // read user to see if they exist
         await agent.get('/user?user_id=testuser').expect(404);
+    });
+
+    it('test POST /search', async () => {
+        await agent
+            .post(`/search`)
+            .send({
+                party_size: 2,
+                api_key: keys.apiKey,
+                auth_token: keys.authToken,
+                query: 'Joe',
+            })
+            .expect(200);
     });
 });

@@ -16,6 +16,15 @@ export function validateDeleteUser(req) {
     return validateEndpoint(req, ['user_id']);
 }
 
+export function validateGetSearchEndpoint(req) {
+    return validateEndpoint(req, [
+        'party_size',
+        'api_key',
+        'auth_token',
+        'query',
+    ]);
+}
+
 function validateEndpoint(req, requiredParams) {
     const missingParam = checkRequestForRequiredParams(req, requiredParams);
 
