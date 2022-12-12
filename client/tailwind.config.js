@@ -8,4 +8,5 @@ module.exports = {
     extend: {},
   },
   plugins: [require("react-widgets-tailwind")],
+  mode: "jit",
 };

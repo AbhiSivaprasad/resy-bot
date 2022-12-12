@@ -16,10 +16,63 @@ code {
 @tailwind components;
 @tailwind utilities;
 
-/* a {
-  @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-600;
-} */
+.a {
+  @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-600 cursor-pointer;
+}
 
 .rmdp-container {
   flex-grow: 1;
+}
+
+.table-drag-select {
+  /* Stretch horizontally to fill parent */
+  width: 100%;
+  /* Keep columns same width */
+  table-layout: fixed;
+  /* Disable text selection */
+  user-select: none;
+  /* Center in parent */
+  margin-left: auto;
+  margin-right: auto;
+  /* Remove space between border */
+  border-collapse: collapse;
+}
+
+/* Table cells */
+.table-drag-select td {
+  text-align: center;
+  /* Cut off long strings of text with ... */
+  text-overflow: ellipsis;
+  overflow: hidden;
+  /* Make transparent gaps between cells. Better than relying on margin
+   * because clicking an element's margin doesn't trigger events */
+  background-clip: padding-box;
+  /* Make cells reasonable size */
+  line-height: 0.5rem;
+  overflow: visible;
+  /* Shows more text when text too big to fit into cell */
+  padding-left: 0rem;
+  padding-right: 0rem;
+}
+
+/* Cells that can be interacted with */
+.table-drag-select td.cell-enabled {
+  /* Make the cursor a + symbol */
+  cursor: cell;
+}
+
+/* Cells that cannot be interacted with */
+.table-drag-select td.cell-disabled {
+  /* Put yer css here */
+}
+
+/* Cells that have been selected */
+.table-drag-select td.cell-selected {
+  background-color: #fa2d23;
+}
+
+/* Cells that are in the process of being selected */
+.table-drag-select td.cell-being-selected {
+  /* This is the blue color you see when you select text with the cursor */
+  background-color: #3f83d5;
 }

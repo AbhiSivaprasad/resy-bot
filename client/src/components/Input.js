@@ -1,9 +1,15 @@
 import { useState } from "react";
-
+const resy_logo = require("../img/resy_logo.png");
 function Input(props) {
   let color = props.color || "red";
   let textColor = props.textColor || "white";
-  let [value, setValue] = useState("");
+
+  // this is so that we can set the initial value from the controlling component
+  // let initValue =
+  //   typeof props.value == "number" && props.options
+  //     ? props.options[props.value]
+  //     : "";
+  let [value, setValue] = useState(props.value);
   let changeHandler = (event) => {
     setValue(event.target.value);
     if (props.onChange) props.onChange(event.target.value);
@@ -43,11 +49,7 @@ function Input(props) {
           </div>
           <div>
             <div onClick={(e) => openResySlug(e, item.url_slug)}>
-              <img
-                width="40px"
-                height="20px"
-                src="https://upload.wikimedia.org/wikipedia/commons/4/43/Resy_logo.svg"
-              />
+              <img width="60px" height="20px" src={resy_logo} />
             </div>
           </div>
         </div>
