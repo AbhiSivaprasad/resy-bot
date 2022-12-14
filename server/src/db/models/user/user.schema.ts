@@ -14,5 +14,23 @@ const UserSchema = new Schema({
         type: Number,
         required: true,
     },
+    reservationRequests: [
+        {
+            venueId: String,
+            constraints: {
+                windows: [
+                    {
+                        startTime: Date,
+                        endTime: Date,
+                    },
+                ],
+                partySize: Number,
+            },
+            expirationTime: Date,
+            retryIntervalSeconds: Number,
+            nextRetryTime: Date,
+            complete: Boolean,
+        },
+    ],
 });
 export default UserSchema;

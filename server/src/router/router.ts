@@ -2,6 +2,8 @@ import express from 'express';
 import { ResyKeys } from '../external/api';
 import {
     deleteUserEndpoint,
+    getAllUsersEndpoint,
+    getReservationRequestsEndpoint,
     getSearchEndpoint,
     getUserEndpoint,
     postUserEndpoint,
@@ -52,6 +54,12 @@ router.put('/user', putUserEndpoint);
 router.delete('/user', deleteUserEndpoint);
 
 /**
+ * GET /allUsers
+ * Get all user ids
+ */
+router.get('/allUsers', getAllUsersEndpoint);
+
+/**
  * POST /search
  * @param partySize: size of party to search for (probably just set to 1 for most flexibility)
  * @param latitude: optional string user's latitude
@@ -63,6 +71,32 @@ router.delete('/user', deleteUserEndpoint);
  */
 router.post('/search', getSearchEndpoint);
 
+/**
+ * GET /reservationRequests
+ * @param user_id: string
+ * Get all active requests for a user
+ */
+router.get('/requests', getReservationRequestsEndpoint);
+
+// /**
+// * DELETE /reservation
+// * @param user_id: string
+// * Get user info given user's id
+// */
+// router.delete('/request', async (req, res) => {
+// if (!req.query.reservation_id) {
+// res.status(400).send('Reservation id is required');
+// return;
+// }
+// const result = await deleteReservation(req.query.reservation_id as string);
+// console.log(
+// 'result is',
+// result,
+// 'reservation is is',
+// req.query.reservation_id,
+// );
+// res.send('success');
+// });
 // /**
 // * POST /reserve
 // * @param venue_id: string
@@ -124,50 +158,4 @@ router.post('/search', getSearchEndpoint);
 // res.send({
 // status: 'success',
 // });
-// });
-
-// /**
-// * GET /requests
-// * @param user_id: string
-// * Get all active requests for a user
-// */
-// router.get('/requests', async (req, res) => {
-// if (!req.query.user_id) {
-// res.status(400).send('User id is required');
-// return;
-// }
-
-// const result = await getUserActiveReservations(req.query.user_id as string);
-// if (result.err) {
-// const error = result.val;
-// switch (error) {
-// case 'USER_NOT_FOUND':
-// res.status(404).send('User not found');
-// return;
-// default:
-// throw new UnreachableCaseError(error);
-// }
-// } else {
-// res.send(result.val);
-// }
-// });
-
-// /**
-// * DELETE /reservation
-// * @param user_id: string
-// * Get user info given user's id
-// */
-// router.delete('/request', async (req, res) => {
-// if (!req.query.reservation_id) {
-// res.status(400).send('Reservation id is required');
-// return;
-// }
-// const result = await deleteReservation(req.query.reservation_id as string);
-// console.log(
-// 'result is',
-// result,
-// 'reservation is is',
-// req.query.reservation_id,
-// );
-// res.send('success');
 // });

@@ -50,6 +50,12 @@ export async function deleteUser(username: string) {
     return result.deletedCount != 0;
 }
 
+export async function getAllUsers() {
+    const users = await UserModel.find({});
+    const userIds = users.map((user) => user.username);
+    return userIds;
+}
+
 export async function getSearch(
     party_size: number,
     latitude: string,
@@ -67,4 +73,11 @@ export async function getSearch(
         query,
         location,
     );
+}
+
+export async function getReservationRequests(username: string) {
+    const user = await UserModel.findOne({ username: username }).select(
+        'reservationRequests',
+    );
+    return user.reservationRequests;
 }

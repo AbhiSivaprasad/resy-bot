@@ -1,8 +1,15 @@
-import { search } from '../external/api';
-import { GeoLocation } from '../external/types';
-import { deleteUser, getSearch, getUser, postUser, putUser } from './handler';
+import {
+    deleteUser,
+    getAllUsers,
+    getReservationRequests,
+    getSearch,
+    getUser,
+    postUser,
+    putUser,
+} from './handler';
 import {
     validateDeleteUser,
+    validateGetReservationRequests,
     validateGetSearchEndpoint,
     validateGetUser,
     validatePostUser,
@@ -13,6 +20,7 @@ export async function getUserEndpoint(req, res) {
     const result = validateGetUser(req);
     if (result.err) {
         res.status(400).send(result.val);
+        return;
     }
 
     const user = await getUser(req.query.user_id);
@@ -27,6 +35,7 @@ export async function postUserEndpoint(req, res) {
     const result = validatePostUser(req);
     if (result.err) {
         res.status(400).send(result.val);
+        return;
     }
 
     const { user_id, concurrentLimit } = req.body;
@@ -43,6 +52,7 @@ export async function putUserEndpoint(req, res) {
     const result = validatePutUser(req);
     if (result.err) {
         res.status(400).send(result.val);
+        return;
     }
 
     const { user_id, api_key, auth_token } = req.body;
@@ -58,6 +68,7 @@ export async function deleteUserEndpoint(req, res) {
     const result = validateDeleteUser(req);
     if (result.err) {
         res.status(400).send(result.val);
+        return;
     }
 
     const { user_id } = req.body;
@@ -73,6 +84,7 @@ export async function getSearchEndpoint(req, res) {
     const result = validateGetSearchEndpoint(req);
     if (result.err) {
         res.status(400).send(result.val);
+        return;
     }
 
     const { party_size, latitude, longitude, api_key, auth_token, query } =
@@ -88,4 +100,22 @@ export async function getSearchEndpoint(req, res) {
     );
 
     res.send(searchResults);
+}
+
+export async function getAllUsersEndpoint(req, res) {
+    const userIds = await getAllUsers();
+    res.status(200).send(userIds);
+}
+
+export async function getReservationRequestsEndpoint(req, res) {
+    const result = validateGetReservationRequests(req);
+    if (result.err) {
+        res.status(400).send(result.val);
+        return;
+    }
+
+    const { user_id } = req.body;
+
+    const reservationRequests = await getReservationRequests(user_id);
+    res.status(200).send(reservationRequests);
 }

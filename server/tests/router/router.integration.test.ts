@@ -75,4 +75,11 @@ describe('testing router', () => {
             })
             .expect(200);
     });
+
+    it('test GET /allUsers', async () => {
+        const userIds = await agent.get('/allUsers').expect(200);
+        if (userIds.body.length > 0) {
+            await agent.get(`/user?user_id=${userIds.body[0]}`).expect(200);
+        }
+    });
 });

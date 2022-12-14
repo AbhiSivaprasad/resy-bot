@@ -25,6 +25,10 @@ export function validateGetSearchEndpoint(req) {
     ]);
 }
 
+export function validateGetReservationRequests(req) {
+    return validateEndpoint(req, ['user_id']);
+}
+
 function validateEndpoint(req, requiredParams) {
     const missingParam = checkRequestForRequiredParams(req, requiredParams);
 
