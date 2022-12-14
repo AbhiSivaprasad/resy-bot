@@ -1,19 +1,23 @@
 import {
+    deleteReservationRequest,
     deleteUser,
     getAllUsers,
     getReservationRequests,
     getSearch,
     getUser,
+    postRequestReservation,
     postUser,
     putUser,
 } from './handler';
 import {
+    validateDeleteReservationRequest,
     validateDeleteUser,
     validateGetReservationRequests,
     validateGetSearchEndpoint,
     validateGetUser,
     validatePostUser,
     validatePutUser,
+    validateRequestReservationEndpoint,
 } from './validate';
 
 export async function getUserEndpoint(req, res) {
@@ -118,4 +122,41 @@ export async function getReservationRequestsEndpoint(req, res) {
 
     const reservationRequests = await getReservationRequests(user_id);
     res.status(200).send(reservationRequests);
+}
+
+export async function deleteReservationRequestEndpoint(req, res) {
+    const result = validateDeleteReservationRequest(req);
+    if (result.err) {
+        res.status(400).send(result.val);
+        return;
+    }
+
+    const { user_id, reservation_id } = req.body;
+
+    const deleted = deleteReservationRequest(user_id, reservation_id);
+    if (!deleted) {
+        res.status(404).send('Delete failed');
+    } else {
+        res.status(200).send('Delete successful');
+    }
+}
+
+export async function postRequestReservationEndpoint(req, res) {
+    const result = validateRequestReservationEndpoint(req);
+    if (result.err) {
+        res.status(400).send(result.val);
+        return;
+    }
+
+    const { user_id, venue_id, slots, retryIntervalSeconds } = req.body;
+
+    const success = await postRequestReservation(
+        user_id,
+        venue_id,
+        retryIntervalSeconds,
+        slots,
+    );
+
+    // return success response
+    res.status(200).send('Reservation request successful');
 }

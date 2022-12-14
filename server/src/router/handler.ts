@@ -1,5 +1,11 @@
+import { Err, Ok } from 'ts-results';
 import { UserModel } from '../db/models/user/user.model';
-import { IUserDocument } from '../db/models/user/user.types';
+import {
+    addReservationRequestForUser,
+    deleteReservationRequestForUser,
+    getActiveRequestCountForUser,
+} from '../db/models/user/user.statics';
+import { ISlotConstraint, IUserDocument } from '../db/models/user/user.types';
 import { search } from '../external/api';
 import { GeoLocation } from '../external/types';
 
@@ -51,7 +57,7 @@ export async function deleteUser(username: string) {
 }
 
 export async function getAllUsers() {
-    const users = await UserModel.find({});
+    const users = await UserModel.find({}).select('username');
     const userIds = users.map((user) => user.username);
     return userIds;
 }
@@ -80,4 +86,47 @@ export async function getReservationRequests(username: string) {
         'reservationRequests',
     );
     return user.reservationRequests;
+}
+
+export async function deleteReservationRequest(
+    username: string,
+    reservationId: string,
+) {
+    return await deleteReservationRequestForUser(username, reservationId);
+}
+
+export async function postRequestReservation(
+    username,
+    venueId,
+    retryIntervalSeconds,
+    slots: ISlotConstraint[],
+) {
+    const user = await UserModel.findOne({ username });
+
+    // set expiration time of request 1 month in the future
+    const expirationTime = new Date();
+    expirationTime.setDate(expirationTime.getDate() + 30);
+
+    // verify the user is within rate limit
+    const numActiveRequestsForUser = await getActiveRequestCountForUser(
+        username,
+    );
+    if (numActiveRequestsForUser < user.concurrentLimit) {
+        return Err(
+            `User is at the concurrent request limit of ${numActiveRequestsForUser}`,
+        );
+    }
+
+    // save the user's request
+    await addReservationRequestForUser(username, {
+        venueId,
+        expirationTime,
+        retryIntervalSeconds,
+        constraints: slots,
+        complete: false,
+    });
+
+    // start the request
+
+    return Ok(null);
 }

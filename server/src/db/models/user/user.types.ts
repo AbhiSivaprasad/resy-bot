@@ -10,15 +10,14 @@ export interface IUser {
 
 export interface IReservationRequest {
     venueId: string;
-    constraints: ISlotConstraints;
+    constraints: ISlotConstraint[];
     expirationTime: Date;
     retryIntervalSeconds: number;
-    nextRetryTime: Date;
     complete: boolean;
 }
 
-export interface ISlotConstraints {
-    windows: ITimeWindow[];
+export interface ISlotConstraint {
+    windows: ITimeWindow;
     partySize: number;
 }
 
