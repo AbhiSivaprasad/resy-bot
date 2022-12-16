@@ -148,14 +148,20 @@ export async function postRequestReservationEndpoint(req, res) {
         return;
     }
 
-    const { user_id, venue_id, slots, retryIntervalSeconds } = req.body;
+    const { user_id, venue_id, timeWindows, partySizes, retryIntervalSeconds } =
+        req.body;
 
-    const success = await postRequestReservation(
+    const response = await postRequestReservation(
         user_id,
         venue_id,
         retryIntervalSeconds,
-        slots,
+        timeWindows,
+        partySizes,
     );
+
+    if (response.err) {
+        res.status(404).send(response.val);
+    }
 
     // return success response
     res.status(200).send('Reservation request successful');

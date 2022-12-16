@@ -44,7 +44,8 @@ export function validateRequestReservationEndpoint(req) {
     const valid = validateRequestForRequiredParams(req, [
         'venue_id',
         'user_id',
-        'slots',
+        'partySizes',
+        'timeWindows',
         'retryIntervalSeconds',
     ]);
 
@@ -52,23 +53,25 @@ export function validateRequestReservationEndpoint(req) {
         return valid;
     }
 
-    const { slots, retry_interval_seconds } = req.body;
-    if (slots.length === 0) {
-        return Err('No slots provided');
+    const { partySizes, timeWindows, retryIntervalSeconds } = req.body;
+    if (partySizes.length === 0) {
+        return Err('No party sizes provided');
+    } else if (timeWindows.length === 0) {
+        return Err('No time windows provided');
     } else if (
-        !Number.isFinite(retry_interval_seconds) ||
-        !Number.isInteger(retry_interval_seconds) ||
-        retry_interval_seconds < 1
+        !Number.isFinite(retryIntervalSeconds) ||
+        !Number.isInteger(retryIntervalSeconds) ||
+        retryIntervalSeconds < 1
     ) {
         return Err('Retry interval must be an integer > 1');
     }
 
     if (
-        slots.some((slot) => {
-            !slot.partySize || !slot.startTime || !slot.endTime;
+        timeWindows.some((window) => {
+            !window.startTime || !window.endTime;
         })
     ) {
-        return Err('At least one slot missing required parameters');
+        return Err('At least one time slot missing required parameters');
     }
 
     return Ok(null);

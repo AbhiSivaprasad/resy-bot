@@ -7,7 +7,7 @@ import { app } from './app';
 dotenv.config({ path: './.env.dev' });
 
 // start app
-const port = 4001;
+const port = 4000;
 app.listen(port, () =>
     console.log(`Express is listening at http://localhost:${port}`),
 );
@@ -25,7 +25,7 @@ const reservationManager = new ReservationRequestManager();
 
 const secondsBetweenProcessingRequests = 3;
 setInterval(() => {
-    reservationManager.processRequests();
+    reservationManager.requestReservations();
 }, secondsBetweenProcessingRequests * 1000);
 
 // TODO: think about whether main should export this

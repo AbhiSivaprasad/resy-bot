@@ -5,9 +5,10 @@ import {
     deleteReservationRequestForUser,
     getActiveRequestCountForUser,
 } from '../db/models/user/user.statics';
-import { ISlotConstraint, IUserDocument } from '../db/models/user/user.types';
+import { ITimeWindow, IUserDocument } from '../db/models/user/user.types';
 import { search } from '../external/api';
 import { GeoLocation } from '../external/types';
+import { reservationManager } from '../main';
 
 export async function getUser(username: string) {
     const user: IUserDocument = await UserModel.findOne({ username: username });
@@ -99,13 +100,14 @@ export async function postRequestReservation(
     username,
     venueId,
     retryIntervalSeconds,
-    slots: ISlotConstraint[],
+    timeWindows: ITimeWindow[],
+    partySizes: number[],
 ) {
     const user = await UserModel.findOne({ username });
 
     // set expiration time of request 1 month in the future
     const expirationTime = new Date();
-    expirationTime.setDate(expirationTime.getDate() + 30);
+    expirationTime.setDate(expirationTime.getDate() + 90);
 
     // verify the user is within rate limit
     const numActiveRequestsForUser = await getActiveRequestCountForUser(
@@ -118,15 +120,26 @@ export async function postRequestReservation(
     }
 
     // save the user's request
-    await addReservationRequestForUser(username, {
+    const reservationRequest = {
         venueId,
         expirationTime,
         retryIntervalSeconds,
-        constraints: slots,
+        timeWindows,
+        partySizes,
         complete: false,
-    });
+    };
+    await addReservationRequestForUser(username, reservationRequest);
 
     // start the request
+    // add keys
+    // add next retry time?
+    const activeReservationRequest = {
+        ...reservationRequest,
+        keys: user.keys,
+        nextRetryTime: new Date(),
+        userId: user.username,
+    };
+    reservationManager.addReservationRequest(activeReservationRequest);
 
     return Ok(null);
 }

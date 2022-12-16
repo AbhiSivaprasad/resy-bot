@@ -1,39 +1,40 @@
-import { Reservation, SlotConstraints } from './db/types';
+import { IReservationRequest, ITimeWindow } from './db/models/user/user.types';
 import { ResyKeys } from './external/api';
 import { getSlots, reserveSlot } from './external/client';
 import { Slot } from './external/types';
+import { logger } from './logger';
+
+export interface ActiveReservationRequest extends IReservationRequest {
+    keys: ResyKeys;
+    nextRetryTime: Date;
+    userId: string;
+}
 
 export class ReservationRequestManager {
-    private requests: ReservationRequest[];
-    constructor(requests?: ReservationRequest[]) {
+    private requests: ActiveReservationRequest[];
+    constructor(requests?: ActiveReservationRequest[]) {
         this.requests = requests || [];
     }
 
-    public async loadActiveRequestsFromDb() {
-        // this.requests = await getActiveReservations();
+    public addReservationRequest(request: ActiveReservationRequest) {
+        this.requests.push(request);
     }
 
-    public addReservationRequests(requests: ReservationRequest[]) {
-        console.log('pushing', requests);
-        this.requests.push(...requests);
-    }
-
-    public removeReservationRequest(request_id) {
-        console.log('length is', this.requests.length);
+    public removeReservationRequest(requestId) {
         this.requests = this.requests.filter(
-            (request) => request._id != request_id,
+            (request) => request._id == requestId,
         );
-        console.log('length is', this.requests.length);
     }
 
-    public processRequests() {
+    public requestReservations() {
         // iterate in reverse to enable safe deletion of finished requests
         for (let i = this.requests.length - 1; i >= 0; i--) {
             const request = this.requests[i];
-            if (this.requestStillValid(request)) {
+            if (this.activeReservationRequestStillValid(request)) {
                 // only try to reserve if it's been sufficiently long since the last attempt
                 if (request.nextRetryTime.valueOf() <= new Date().valueOf()) {
-                    const reservationSuccessful = this.processRequest(request);
+                    const reservationSuccessful =
+                        this.requestReservation(request);
                     if (reservationSuccessful) {
                         // remove request if the reservation was successful
                         console.log(
@@ -58,38 +59,59 @@ export class ReservationRequestManager {
         }
     }
 
-    private async processRequest(request: ReservationRequest) {
+    private async requestReservation(request: ActiveReservationRequest) {
         const slotToReserve = await this.findSuitableReservationRequest(
             request.venueId,
-            request.constraints,
+            request.partySizes,
+            request.timeWindows,
             request.keys,
         );
 
         if (slotToReserve) {
-            const response = await reserveSlot(slotToReserve, request.keys);
-            // if (response.success) {
-            // console.log('Successfully reserved slot');
-            // return true;
-            // }
+            const reservationResponse = await reserveSlot(
+                slotToReserve,
+                request.keys,
+            );
+
+            // remove the reservation request if it was successful or we have somehow already booked it
+            let shouldRemoveRequest = !reservationResponse.err;
+            if (reservationResponse.err) {
+                switch (reservationResponse.val) {
+                    case 'SLOT_ALREADY_BOOKED':
+                        shouldRemoveRequest = true;
+                        logger.error(
+                            `Rebooking booked slot. Request: ${request}\n\nSlot to reserve ${slotToReserve}`,
+                        );
+                    case 'FAILED_TO_BOOK_SLOT':
+                        logger.log(
+                            `Snipe failed. Request: ${request}\n\nSlot to reserve: ${slotToReserve}`,
+                        );
+                }
+            }
+
+            return shouldRemoveRequest;
         }
 
         return false;
     }
 
-    private requestStillValid(request: Reservation) {
+    private activeReservationRequestStillValid(
+        request: ActiveReservationRequest,
+    ) {
         return request.expirationTime.valueOf() >= new Date().valueOf();
     }
 
     private findSuitableReservationRequest = async (
         venueId: string,
-        constraints: SlotConstraints,
+        partySizes: number[],
+        timeWindows: ITimeWindow[],
         keys: ResyKeys,
     ): Promise<Slot | undefined> => {
         // find all unique dates we need to check for available reservations
         // remove dates in the past (we may have been trying to snipe for multiple days)
         const allowedDates = [
             ...new Set(
-                constraints.windows.map((window) =>
+                timeWindows.map((window) =>
                     window.startTime.toISOString().substring(0, 10),
                 ),
             ),
@@ -97,19 +119,16 @@ export class ReservationRequestManager {
 
         // return the first slot that meets the constraints to minimize api calls
         let slotToReserve = undefined;
-        for (const date of allowedDates) {
-            const slots = await getSlots(
-                venueId,
-                date,
-                constraints.partySize,
-                keys,
-            );
-            const suitableSlots = slots.filter((slot) =>
-                this.doesSlotMeetConstraints(slot, constraints),
-            );
-            if (suitableSlots.length > 0) {
-                slotToReserve = suitableSlots[0];
-                break;
+        for (const partySize of partySizes) {
+            for (const date of allowedDates) {
+                const slots = await getSlots(venueId, date, partySize, keys);
+                const suitableSlots = slots.filter((slot) =>
+                    this.doesSlotMeetConstraints(slot, timeWindows, partySizes),
+                );
+                if (suitableSlots.length > 0) {
+                    slotToReserve = suitableSlots[0];
+                    break;
+                }
             }
         }
 
@@ -118,18 +137,15 @@ export class ReservationRequestManager {
 
     private doesSlotMeetConstraints = (
         slot: Slot,
-        constraints: SlotConstraints,
+        timeWindows: ITimeWindow[],
+        partySizes: number[],
     ): boolean => {
-        const slotIsInWindow = constraints.windows.some(
+        const slotIsInWindow = timeWindows.some(
             (window) =>
                 slot.startTime >= window.startTime &&
                 slot.startTime <= window.endTime,
         );
-        const slotIsRightSize = slot.size == constraints.partySize;
+        const slotIsRightSize = partySizes.includes(slot.size);
         return slotIsInWindow && slotIsRightSize;
     };
 }
-
-type ReservationRequest = Reservation & {
-    keys: ResyKeys;
-};

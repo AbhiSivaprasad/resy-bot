@@ -1,4 +1,4 @@
-import { Document, Model } from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
 import { ResyKeys } from '../../../external/api';
 
 export interface IUser {
@@ -9,16 +9,13 @@ export interface IUser {
 }
 
 export interface IReservationRequest {
+    _id?: mongoose.Types.ObjectId;
     venueId: string;
-    constraints: ISlotConstraint[];
+    timeWindows: ITimeWindow[];
+    partySizes: number[];
     expirationTime: Date;
     retryIntervalSeconds: number;
     complete: boolean;
-}
-
-export interface ISlotConstraint {
-    windows: ITimeWindow;
-    partySize: number;
 }
 
 export interface ITimeWindow {
