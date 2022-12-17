@@ -27,3 +27,5 @@ db layer for complex ORM usages. Also, if you want to get coverage of these simp
 8. File naming is hard...
 
 9. Why isn't my mongoose type safety working?
+
+10. Got sniped for a while about whether main.ts should export ReservationRequestManager()

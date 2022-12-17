@@ -1,18 +1,18 @@
 import { Err, Ok } from 'ts-results';
 
 export function validateGetUser(req) {
-    return validateRequestForRequiredParams(req, ['user_id']);
+    return validateRequestForRequiredParams(req.query, ['user_id']);
 }
 
 export function validatePostUser(req) {
-    return validateRequestForRequiredParams(req, [
+    return validateRequestForRequiredParams(req.body, [
         'user_id',
         'concurrentLimit',
     ]);
 }
 
 export function validatePutUser(req) {
-    return validateRequestForRequiredParams(req, [
+    return validateRequestForRequiredParams(req.body, [
         'user_id',
         'api_key',
         'auth_token',
@@ -20,11 +20,11 @@ export function validatePutUser(req) {
 }
 
 export function validateDeleteUser(req) {
-    return validateRequestForRequiredParams(req, ['user_id']);
+    return validateRequestForRequiredParams(req.body, ['user_id']);
 }
 
 export function validateGetSearchEndpoint(req) {
-    return validateRequestForRequiredParams(req, [
+    return validateRequestForRequiredParams(req.query, [
         'party_size',
         'api_key',
         'auth_token',
@@ -33,15 +33,15 @@ export function validateGetSearchEndpoint(req) {
 }
 
 export function validateGetReservationRequests(req) {
-    return validateRequestForRequiredParams(req, ['user_id']);
+    return validateRequestForRequiredParams(req.query, ['user_id']);
 }
 
 export function validateDeleteReservationRequest(req) {
-    return validateRequestForRequiredParams(req, ['reservation_id']);
+    return validateRequestForRequiredParams(req.body, ['reservation_id']);
 }
 
 export function validateRequestReservationEndpoint(req) {
-    const valid = validateRequestForRequiredParams(req, [
+    const valid = validateRequestForRequiredParams(req.body, [
         'venue_id',
         'user_id',
         'partySizes',

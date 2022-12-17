@@ -11,6 +11,7 @@ export interface IUser {
 export interface IReservationRequest {
     _id?: mongoose.Types.ObjectId;
     venueId: string;
+    venueMetadata: any;
     timeWindows: ITimeWindow[];
     partySizes: number[];
     expirationTime: Date;

@@ -26,20 +26,24 @@ export class ReservationRequestManager {
         );
     }
 
-    public requestReservations() {
+    public getActiveReservationRequests() {
+        return this.requests.filter(this.activeReservationRequestStillValid);
+    }
+
+    public async requestReservations() {
         // iterate in reverse to enable safe deletion of finished requests
         for (let i = this.requests.length - 1; i >= 0; i--) {
             const request = this.requests[i];
             if (this.activeReservationRequestStillValid(request)) {
                 // only try to reserve if it's been sufficiently long since the last attempt
                 if (request.nextRetryTime.valueOf() <= new Date().valueOf()) {
-                    const reservationSuccessful =
-                        this.requestReservation(request);
+                    const reservationSuccessful = await this.requestReservation(
+                        request,
+                    );
                     if (reservationSuccessful) {
                         // remove request if the reservation was successful
-                        console.log(
-                            'successful reservation for ',
-                            request.userId,
+                        logger.log(
+                            `successful reservation for ${request.userId}`,
                         );
                         this.requests.splice(i, 1);
                     } else {
@@ -52,14 +56,14 @@ export class ReservationRequestManager {
                     }
                 }
             } else {
-                // remove request if reservation was unsuccessful but expriation time has passed
-                console.log('expiration time passed, removing');
+                // remove request if reservation was unsuccessful but expiration time has passed
+                logger.log('expiration time passed, removing');
                 this.requests.splice(i, 1);
             }
         }
     }
 
-    private async requestReservation(request: ActiveReservationRequest) {
+    public async requestReservation(request: ActiveReservationRequest) {
         const slotToReserve = await this.findSuitableReservationRequest(
             request.venueId,
             request.partySizes,
@@ -79,7 +83,7 @@ export class ReservationRequestManager {
                 switch (reservationResponse.val) {
                     case 'SLOT_ALREADY_BOOKED':
                         shouldRemoveRequest = true;
-                        logger.error(
+                        logger.log(
                             `Rebooking booked slot. Request: ${request}\n\nSlot to reserve ${slotToReserve}`,
                         );
                     case 'FAILED_TO_BOOK_SLOT':
@@ -101,7 +105,7 @@ export class ReservationRequestManager {
         return request.expirationTime.valueOf() >= new Date().valueOf();
     }
 
-    private findSuitableReservationRequest = async (
+    public findSuitableReservationRequest = async (
         venueId: string,
         partySizes: number[],
         timeWindows: ITimeWindow[],
@@ -135,7 +139,7 @@ export class ReservationRequestManager {
         return slotToReserve;
     };
 
-    private doesSlotMeetConstraints = (
+    public doesSlotMeetConstraints = (
         slot: Slot,
         timeWindows: ITimeWindow[],
         partySizes: number[],
@@ -149,3 +153,6 @@ export class ReservationRequestManager {
         return slotIsInWindow && slotIsRightSize;
     };
 }
+
+// data structure to manage reservation requests
+export const reservationManager = new ReservationRequestManager();

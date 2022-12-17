@@ -23,14 +23,20 @@ export async function addReservationRequestForUser(
     username: string,
     request: IReservationRequest,
 ) {
-    await UserModel.updateOne(
+    const user = await UserModel.findOneAndUpdate(
         { username },
         {
             $push: {
                 reservationRequests: request,
             },
         },
+        { new: true },
     );
+
+    // last added reservation request
+    return user.toObject().reservationRequests[
+        user.reservationRequests.length - 1
+    ];
 }
 
 export async function deleteReservationRequestForUser(

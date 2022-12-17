@@ -1,10 +1,12 @@
+import { log } from 'console';
+
 export class Logger {
     log(message): void {
-        console.log(message);
+        log(message);
     }
 
     error(message): void {
-        console.log(message);
+        log(message);
     }
 }
 

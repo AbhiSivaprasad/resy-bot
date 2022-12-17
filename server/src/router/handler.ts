@@ -8,7 +8,7 @@ import {
 import { ITimeWindow, IUserDocument } from '../db/models/user/user.types';
 import { search } from '../external/api';
 import { GeoLocation } from '../external/types';
-import { reservationManager } from '../main';
+import { reservationManager } from '../plan';
 
 export async function getUser(username: string) {
     const user: IUserDocument = await UserModel.findOne({ username: username });
@@ -99,6 +99,7 @@ export async function deleteReservationRequest(
 export async function postRequestReservation(
     username,
     venueId,
+    venueMetadata: any,
     retryIntervalSeconds,
     timeWindows: ITimeWindow[],
     partySizes: number[],
@@ -113,7 +114,7 @@ export async function postRequestReservation(
     const numActiveRequestsForUser = await getActiveRequestCountForUser(
         username,
     );
-    if (numActiveRequestsForUser < user.concurrentLimit) {
+    if (numActiveRequestsForUser >= user.concurrentLimit) {
         return Err(
             `User is at the concurrent request limit of ${numActiveRequestsForUser}`,
         );
@@ -122,19 +123,21 @@ export async function postRequestReservation(
     // save the user's request
     const reservationRequest = {
         venueId,
+        venueMetadata,
         expirationTime,
         retryIntervalSeconds,
         timeWindows,
         partySizes,
         complete: false,
     };
-    await addReservationRequestForUser(username, reservationRequest);
+    const savedReservationRequest = await addReservationRequestForUser(
+        username,
+        reservationRequest,
+    );
 
     // start the request
-    // add keys
-    // add next retry time?
     const activeReservationRequest = {
-        ...reservationRequest,
+        ...savedReservationRequest,
         keys: user.keys,
         nextRetryTime: new Date(),
         userId: user.username,

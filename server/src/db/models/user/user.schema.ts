@@ -1,27 +1,25 @@
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 
 const ReservationRequestSchema = new Schema({
     venueId: {
         type: String,
         required: true,
     },
-    constraints: {
-        windows: [
-            {
-                startTime: {
-                    type: Date,
-                    required: true,
-                },
-                endTime: {
-                    type: Date,
-                    required: true,
-                },
+    timeWindows: [
+        {
+            startTime: {
+                type: Date,
+                required: true,
             },
-        ],
-        partySize: {
-            type: Number,
-            required: true,
+            endTime: {
+                type: Date,
+                required: true,
+            },
         },
+    ],
+    partySizes: {
+        type: [Number],
+        required: true,
     },
     expirationTime: {
         type: Date,
@@ -33,6 +31,10 @@ const ReservationRequestSchema = new Schema({
     },
     complete: {
         type: Boolean,
+        required: true,
+    },
+    venueMetadata: {
+        type: Object,
         required: true,
     },
 });

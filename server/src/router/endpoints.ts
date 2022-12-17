@@ -17,7 +17,7 @@ import {
     validateGetUser,
     validatePostUser,
     validatePutUser,
-    validateRequestReservationEndpoint,
+    validateRequestReservationEndpoint as validateReservationRequestionEndpoint,
 } from './validate';
 
 export async function getUserEndpoint(req, res) {
@@ -141,8 +141,8 @@ export async function deleteReservationRequestEndpoint(req, res) {
     }
 }
 
-export async function postRequestReservationEndpoint(req, res) {
-    const result = validateRequestReservationEndpoint(req);
+export async function postReservationRequestEndpoint(req, res) {
+    const result = validateReservationRequestionEndpoint(req);
     if (result.err) {
         res.status(400).send(result.val);
         return;
@@ -151,9 +151,16 @@ export async function postRequestReservationEndpoint(req, res) {
     const { user_id, venue_id, timeWindows, partySizes, retryIntervalSeconds } =
         req.body;
 
+    const venueMetadata = req.body.venueMetadata || {};
+    timeWindows.forEach((timeWindow) => {
+        timeWindow.startTime = new Date(timeWindow.startTime);
+        timeWindow.endTime = new Date(timeWindow.endTime);
+    });
+
     const response = await postRequestReservation(
         user_id,
         venue_id,
+        venueMetadata,
         retryIntervalSeconds,
         timeWindows,
         partySizes,
@@ -161,6 +168,7 @@ export async function postRequestReservationEndpoint(req, res) {
 
     if (response.err) {
         res.status(404).send(response.val);
+        return;
     }
 
     // return success response
