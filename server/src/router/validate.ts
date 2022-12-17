@@ -23,11 +23,10 @@ export function validateDeleteUser(req) {
     return validateRequestForRequiredParams(req.body, ['user_id']);
 }
 
-export function validateGetSearchEndpoint(req) {
-    return validateRequestForRequiredParams(req.query, [
-        'party_size',
-        'api_key',
-        'auth_token',
+export function validatePostSearchEndpoint(req) {
+    return validateRequestForRequiredParams(req.body, [
+        'user_id',
+        'partySize',
         'query',
     ]);
 }
@@ -40,7 +39,7 @@ export function validateDeleteReservationRequest(req) {
     return validateRequestForRequiredParams(req.body, ['reservation_id']);
 }
 
-export function validateRequestReservationEndpoint(req) {
+export function validatePostReservationRequestEndpoint(req) {
     const valid = validateRequestForRequiredParams(req.body, [
         'venue_id',
         'user_id',

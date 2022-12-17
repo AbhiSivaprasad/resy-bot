@@ -1,3 +1,4 @@
+import { GeoLocation } from '../external/types';
 import {
     deleteReservationRequest,
     deleteUser,
@@ -13,11 +14,11 @@ import {
     validateDeleteReservationRequest,
     validateDeleteUser,
     validateGetReservationRequests,
-    validateGetSearchEndpoint,
+    validatePostSearchEndpoint,
     validateGetUser,
     validatePostUser,
     validatePutUser,
-    validateRequestReservationEndpoint as validateReservationRequestionEndpoint,
+    validatePostReservationRequestEndpoint,
 } from './validate';
 
 export async function getUserEndpoint(req, res) {
@@ -84,26 +85,31 @@ export async function deleteUserEndpoint(req, res) {
     }
 }
 
-export async function getSearchEndpoint(req, res) {
-    const result = validateGetSearchEndpoint(req);
+export async function postSearchEndpoint(req, res) {
+    const result = validatePostSearchEndpoint(req);
     if (result.err) {
         res.status(400).send(result.val);
         return;
     }
 
-    const { party_size, latitude, longitude, api_key, auth_token, query } =
-        req.body;
+    const { user_id, partySize, latitude, longitude, query } = req.body;
+
+    const location: GeoLocation =
+        latitude && longitude ? { latitude, longitude } : undefined;
 
     const searchResults = await getSearch(
-        parseInt(party_size),
-        latitude,
-        longitude,
-        api_key,
-        auth_token,
+        user_id,
+        parseInt(partySize),
         query,
+        location,
     );
 
-    res.send(searchResults);
+    if (searchResults.err) {
+        res.status(404).send(searchResults.val);
+        return;
+    }
+
+    res.status(200).send(searchResults.val);
 }
 
 export async function getAllUsersEndpoint(req, res) {
@@ -142,7 +148,7 @@ export async function deleteReservationRequestEndpoint(req, res) {
 }
 
 export async function postReservationRequestEndpoint(req, res) {
-    const result = validateReservationRequestionEndpoint(req);
+    const result = validatePostReservationRequestEndpoint(req);
     if (result.err) {
         res.status(400).send(result.val);
         return;

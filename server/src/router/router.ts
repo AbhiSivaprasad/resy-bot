@@ -1,14 +1,14 @@
 import express from 'express';
 import {
-    deleteReservationRequestEndpoint,
     deleteUserEndpoint,
     getAllUsersEndpoint,
-    getReservationRequestsEndpoint,
-    getSearchEndpoint,
+    postSearchEndpoint,
     getUserEndpoint,
-    postReservationRequestEndpoint,
     postUserEndpoint,
     putUserEndpoint,
+    getReservationRequestsEndpoint,
+    deleteReservationRequestEndpoint,
+    postReservationRequestEndpoint,
 } from './endpoints';
 
 export const router = express.Router();
@@ -55,15 +55,14 @@ router.get('/allUsers', getAllUsersEndpoint);
 
 /**
  * POST /search
+ * @param user_id: string
  * @param partySize: size of party to search for (probably just set to 1 for most flexibility)
  * @param latitude: optional string user's latitude
  * @param longitude: optional string user's longitude
- * @param api_key: string
- * @param auth_token: string
  *
  * Proxy to Resy's search endpoint
  */
-router.post('/search', getSearchEndpoint);
+router.post('/search', postSearchEndpoint);
 
 /**
  * GET /reservationRequests

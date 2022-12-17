@@ -64,22 +64,18 @@ export async function getAllUsers() {
 }
 
 export async function getSearch(
-    party_size: number,
-    latitude: string,
-    longitude: string,
-    api_key: string,
-    auth_token: string,
+    username: string,
+    partySize: number,
     query: string,
+    location?: GeoLocation,
 ) {
-    const location: GeoLocation =
-        latitude && longitude ? { latitude, longitude } : undefined;
-
-    return await search(
-        party_size,
-        { apiKey: api_key, authToken: auth_token },
-        query,
-        location,
-    );
+    const user = await UserModel.findOne({ username: username }).select('keys');
+    if (!user) {
+        return Err('USER_NOT_FOUND');
+    }
+    const keys = user.keys;
+    const response = await search(partySize, keys, query, location);
+    return Ok(response);
 }
 
 export async function getReservationRequests(username: string) {

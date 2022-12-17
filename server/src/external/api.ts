@@ -121,6 +121,7 @@ export const search = async (
     };
 
     const response = await axios(config);
+
     return response.data;
 };
 
