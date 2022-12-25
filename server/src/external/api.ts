@@ -30,8 +30,12 @@ export const getVenueDetails = async (
             false,
         ),
     };
-    const response: AxiosResponse = await axios(config);
-    return response.data;
+    try {
+        const response: AxiosResponse = await axios(config);
+        return Ok(response.data);
+    } catch (error) {
+        return Err('API_KEYS_INVALID');
+    }
 };
 
 export const getSlotDetails = async (
@@ -61,8 +65,12 @@ export const getSlotDetails = async (
         data: data,
     };
 
-    const response = await axios(config);
-    return response.data;
+    try {
+        const response = await axios(config);
+        return Ok(response.data);
+    } catch (error) {
+        return Err('API_KEYS_INVALID');
+    }
 };
 
 export const bookSlot = async (bookToken: string, keys: ResyKeys) => {
@@ -84,8 +92,12 @@ export const bookSlot = async (bookToken: string, keys: ResyKeys) => {
     };
 
     // the server returns 412 but the request is successful so use the error response
-    const response = await axios(config).catch((error) => error.response);
-    return response.data;
+    try {
+        const response = await axios(config).catch((error) => error.response);
+        return Ok(response.data);
+    } catch (error) {
+        return Err('API_KEYS_INVALID');
+    }
 };
 
 export const search = async (

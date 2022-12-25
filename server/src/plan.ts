@@ -181,7 +181,10 @@ export class ReservationRequestManager {
         for (const partySize of partySizes) {
             for (const date of allowedDates) {
                 const slots = await getSlots(venueId, date, partySize, keys);
-                const suitableSlots = slots.filter((slot) =>
+                if (slots.err) {
+                    continue;
+                }
+                const suitableSlots = slots.val.filter((slot) =>
                     this.doesSlotMeetConstraints(slot, timeWindows, partySizes),
                 );
                 if (suitableSlots.length > 0) {

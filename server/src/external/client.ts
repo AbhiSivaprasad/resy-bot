@@ -6,7 +6,7 @@ import {
     search,
 } from './api';
 import { logger } from '../logger';
-import { BookResponse, GeoLocation, Slot, SlotBookingInfo } from './types';
+import { GeoLocation, Slot, SlotBookingInfo } from './types';
 import { Err, Ok, Result } from 'ts-results';
 
 // get available slots for a venue
@@ -15,9 +15,12 @@ export const getSlots = async (
     date: Date,
     partySize: number,
     keys: ResyKeys,
-): Promise<Slot[]> => {
+): Promise<Ok<Slot[]> | Err<any>> => {
     const response = await getVenueDetails(venueId, date, partySize, keys);
-    let slots = response?.results?.venues[0]?.slots;
+    if (response.err) {
+        return response;
+    }
+    let slots = response.val?.results?.venues[0]?.slots;
     if (!slots) {
         logger.log('Slots not found in API response');
         slots = [];
@@ -37,17 +40,25 @@ export const getSlots = async (
     return processedSlots;
 };
 
-type ReserveSlotErrors = 'SLOT_ALREADY_BOOKED' | 'FAILED_TO_BOOK_SLOT';
-
 export const reserveSlot = async (
     slot: Slot,
     keys: ResyKeys,
-): Promise<Result<void, ReserveSlotErrors>> => {
+): Promise<Result<void, any>> => {
+    // get the booking token for the slot, it's required to reserve the slot
     const bookingInfo = await getSlotBookingInfo(slot, keys);
-    const response = await bookSlot(bookingInfo.bookToken, keys);
-    if (response.reservation_id) {
+    if (bookingInfo.err) {
+        return bookingInfo;
+    }
+
+    // actually snipe the reservation
+    const response = await bookSlot(bookingInfo.val.bookToken, keys);
+    if (response.err) {
+        return response;
+    }
+
+    if (response.val.reservation_id) {
         return Ok(undefined);
-    } else if (response.specs) {
+    } else if (response.val.specs) {
         // we are trying to book a slot we've already booked
         return Err('SLOT_ALREADY_BOOKED');
     } else {
@@ -59,20 +70,23 @@ export const reserveSlot = async (
 export const getSlotBookingInfo = async (
     slot: Slot,
     keys: ResyKeys,
-): Promise<SlotBookingInfo> => {
+): Promise<Result<SlotBookingInfo, any>> => {
     const response = await getSlotDetails(
         slot.token,
         slot.startTime,
         slot.size,
         keys,
     );
-    const bookToken = response?.book_token?.value;
+    if (response.err) {
+        return response;
+    }
+    const bookToken = response.val?.book_token?.value;
     if (bookToken) {
-        return {
+        return Ok({
             bookToken,
-        };
+        });
     } else {
-        throw new Error('Book token not found in API response');
+        return Err('UNEXPECTED_RESY_API_RESPONSE');
     }
 };
 

@@ -49,7 +49,7 @@ export function validateDeleteReservationRequest(req) {
 
 export function validatePostReservationRequestEndpoint(req) {
     const valid = validateRequestForRequiredParamsAndTypes(req.body, {
-        venues: [{ id: 'string', metadata: 'any' }],
+        venues: [{ id: 'string', 'metadata?': 'any' }],
         user_id: 'string',
         partySizes: ['number'],
         timeWindows: [{ startTime: 'date', endTime: 'date' }],
