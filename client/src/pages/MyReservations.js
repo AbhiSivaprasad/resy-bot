@@ -6,6 +6,9 @@ import { Link } from "react-router-dom";
 import { UserContext } from "../App";
 import Button from "../components/Button";
 import Popup from "../components/Popup";
+const resy_logo = require("../img/resy_logo.png");
+const RESY_RESERVATIONS_LINK =
+  "https://resy.com/account/reservations-and-notify";
 
 function MyReservations() {
   let [pendingRequests, setPendingRequests] = useState([]);
@@ -98,9 +101,17 @@ function MyReservations() {
           <span> for a party of </span>
           {request.partySizes[0]}
         </div>
-        <Button onClick={() => setRequestToBeDeleted(request._id)}>
-          Remove
-        </Button>
+        {request.complete ? (
+          <img
+            src={resy_logo}
+            width="80px"
+            onClick={() => window.open(RESY_RESERVATIONS_LINK)}
+          ></img>
+        ) : (
+          <Button onClick={() => setRequestToBeDeleted(request._id)}>
+            Remove
+          </Button>
+        )}
       </div>
     </div>
   );
