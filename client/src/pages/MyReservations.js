@@ -54,7 +54,8 @@ function MyReservations() {
 
   let dateString = (time) =>
     time.toLocaleTimeString("en-us", {
-      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
 
   let displayRequest = (request) => (
@@ -65,10 +66,10 @@ function MyReservations() {
       <div className="flex flex-row items-center w-full space-x-4">
         <div className="flex-grow">
           <div className="flex flex-row items-center space-x-4">
-            <div>Venue: {request.venueId}</div>
+            <div>Venues: {request.venueId}</div>
           </div>
-          {request.constraints?.windows &&
-            request.constraints.windows
+          {request.timeWindows &&
+            request.timeWindows
               .map((slot) => {
                 return `On ${dateString(
                   new Date(slot.startTime)
@@ -77,6 +78,8 @@ function MyReservations() {
                 )} and ${timeString(new Date(slot.endTime))}`;
               })
               .join(", ")}
+          <span> for a party of </span>
+          {request.partySizes[0]}
         </div>
         <Button onClick={() => setRequestToBeDeleted(request._id)}>
           Remove
