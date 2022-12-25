@@ -124,10 +124,14 @@ export async function getReservationRequestsEndpoint(req, res) {
         return;
     }
 
-    const { user_id } = req.body;
+    const { user_id } = req.query;
 
     const reservationRequests = await getReservationRequests(user_id);
-    res.status(200).send(reservationRequests);
+    if (reservationRequests.err) {
+        res.status(404).send(reservationRequests.val);
+        return;
+    }
+    res.status(200).send(reservationRequests.val);
 }
 
 export async function deleteReservationRequestEndpoint(req, res) {

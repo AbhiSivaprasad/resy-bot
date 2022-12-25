@@ -82,7 +82,10 @@ export async function getReservationRequests(username: string) {
     const user = await UserModel.findOne({ username: username }).select(
         'reservationRequests',
     );
-    return user.reservationRequests;
+    if (!user) {
+        return Err('USER_NOT_FOUND');
+    }
+    return Ok(user.reservationRequests || []);
 }
 
 export async function deleteReservationRequest(

@@ -29,3 +29,14 @@ db layer for complex ORM usages. Also, if you want to get coverage of these simp
 9. Why isn't my mongoose type safety working?
 
 10. Got sniped for a while about whether main.ts should export ReservationRequestManager()
+
+Logically, RRM needs to hold some state, so we need a running instance of the class.
+Should main.ts create this instance and pass it down to other services that need it? In this case,
+that's incredibly annoying. You would need to pass it from main --> app --> router --> handler.
+
+Well then main.ts could make the instance of RRM and export it. The router's handler could then import
+and use it. This creates weird and annoying circular imports. Also intuitively modules should not be 
+importing anything from main.ts which is in charge of configuring and running the modules.
+
+The last option I see is to have RRM actually create and export its instance. Instead of main.ts
+configuring and creating RRM instance, it can import the instance and then configure it. 
