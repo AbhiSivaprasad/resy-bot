@@ -1,10 +1,18 @@
 import { Schema } from 'mongoose';
 
 const ReservationRequestSchema = new Schema({
-    venueId: {
-        type: String,
-        required: true,
-    },
+    venues: [
+        {
+            id: {
+                type: String,
+                required: true,
+            },
+            metadata: {
+                type: Object,
+                required: true,
+            },
+        },
+    ],
     timeWindows: [
         {
             startTime: {
@@ -31,10 +39,6 @@ const ReservationRequestSchema = new Schema({
     },
     complete: {
         type: Boolean,
-        required: true,
-    },
-    venueMetadata: {
-        type: Object,
         required: true,
     },
 });

@@ -4,8 +4,6 @@ import { app } from './app';
 import { logger } from './logger';
 import { reservationManager } from './plan';
 
-console.log('HELLO WORasdfasdfLD');
-
 // read environment variables from .env file
 dotenv.config({ path: './.env.dev' });
 
