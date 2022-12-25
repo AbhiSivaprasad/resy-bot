@@ -29,10 +29,14 @@ describe('non-automating testing router', () => {
         // create reservation
         const response = await agent.post('/reservationRequest').send({
             user_id: 'testuser',
-            venue_id: '10191',
-            venueMetadata: {
-                name: "Joe's Seafood, Prime Steak & Stone Crab",
-            },
+            venues: [
+                {
+                    id: '10191',
+                    metadata: {
+                        name: "Joe's Seafood, Prime Steak & Stone Crab",
+                    },
+                },
+            ],
             timeWindows: [
                 {
                     startTime: '2022-12-17T12:00:00.000Z',

@@ -10,14 +10,18 @@ describe('testing reservation manager', () => {
     it('test reserving a slot', async () => {
         const reserved = await reservationManager.requestReservation({
             userId: 'testuser',
-            venueId: '10191',
-            venueMetadata: {
-                name: "Joe's Seafood, Prime Steak & Stone Crab",
-            },
+            venues: [
+                {
+                    id: '10191',
+                    metadata: {
+                        name: "Joe's Seafood, Prime Steak & Stone Crab",
+                    },
+                },
+            ],
             timeWindows: [
                 {
-                    startTime: new Date('2022-12-17T12:00:00.000Z'),
-                    endTime: new Date('2022-12-17T20:00:00.000Z'),
+                    startTime: new Date('2022-12-26T12:00:00.000Z'),
+                    endTime: new Date('2022-12-26T20:00:00.000Z'),
                 },
             ],
             partySizes: [2],
@@ -25,7 +29,7 @@ describe('testing reservation manager', () => {
             keys,
             nextRetryTime: new Date(),
             complete: false,
-            expirationTime: new Date('2027-12-17T20:00:00.000Z'),
+            expirationTime: new Date('2027-12-26T20:00:00.000Z'),
         });
 
         expect(reserved).toBe(true);
@@ -36,12 +40,12 @@ describe('testing reservation manager', () => {
             [2, 3],
             [
                 {
-                    startTime: new Date('2022-12-17T12:12:12.000Z'),
-                    endTime: new Date('2022-12-17T20:12:12.000Z'),
+                    startTime: new Date('2022-12-27T12:12:12.000Z'),
+                    endTime: new Date('2022-12-27T20:12:12.000Z'),
                 },
                 {
-                    startTime: new Date('2022-12-18T15:12:12.000Z'),
-                    endTime: new Date('2022-12-18T23:12:12.000Z'),
+                    startTime: new Date('2022-12-28T15:12:12.000Z'),
+                    endTime: new Date('2022-12-28T23:12:12.000Z'),
                 },
             ],
             keys,
