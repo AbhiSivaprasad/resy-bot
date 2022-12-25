@@ -15,7 +15,7 @@ export interface IReservationRequest {
     partySizes: number[];
     expirationTime: Date;
     retryIntervalSeconds: number;
-    complete: boolean;
+    bookedSlot?: IBookedSlot;
 }
 
 export interface ITimeWindow {
@@ -26,6 +26,11 @@ export interface ITimeWindow {
 export interface IVenue {
     id: string;
     metadata?: any;
+}
+
+export interface IBookedSlot {
+    venueId: string;
+    timeWindow: ITimeWindow;
 }
 
 export interface IUserDocument extends IUser, Document {}

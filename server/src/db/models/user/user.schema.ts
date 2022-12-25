@@ -37,9 +37,9 @@ const ReservationRequestSchema = new Schema({
         type: Number,
         required: true,
     },
-    complete: {
-        type: Boolean,
-        required: true,
+    bookedSlot: {
+        type: Object,
+        required: false,
     },
 });
 

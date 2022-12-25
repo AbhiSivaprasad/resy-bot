@@ -39,20 +39,29 @@ export class ReservationRequestManager {
             if (this.activeReservationRequestStillValid(request)) {
                 // only try to reserve if it's been sufficiently long since the last attempt
                 if (request.nextRetryTime.valueOf() <= new Date().valueOf()) {
-                    const reservationSuccessful = await this.requestReservation(
-                        request,
-                    );
-                    if (reservationSuccessful) {
-                        // remove request if the reservation was successful
+                    const {
+                        shouldRemoveRequest,
+                        bookedVenueId,
+                        bookedTimeWindow,
+                    } = await this.requestReservation(request);
+
+                    if (shouldRemoveRequest) {
+                        // remove request from queue
                         logger.log(
                             `successful reservation for ${prettyprint(
                                 request,
                             )}`,
                         );
                         this.requests.splice(i, 1);
+                    }
 
-                        // mark the request as complete
-                        await this.markReservationRequestComplete(request);
+                    if (bookedVenueId && bookedTimeWindow) {
+                        // booking was successful, mark the request as complete
+                        await this.markReservationRequestComplete(
+                            request,
+                            bookedVenueId,
+                            bookedTimeWindow,
+                        );
                     } else {
                         // if the reservation was not successful, schedule a retry
                         request.nextRetryTime = new Date();
@@ -92,25 +101,57 @@ export class ReservationRequestManager {
             );
 
             // remove the reservation request if it was successful or we have somehow already booked it
-            let shouldRemoveRequest = !reservationResponse.err;
+            let shouldRemoveRequest = null;
             if (reservationResponse.err) {
                 switch (reservationResponse.val) {
                     case 'SLOT_ALREADY_BOOKED':
                         shouldRemoveRequest = true;
                         logger.log(
-                            `Rebooking booked slot. Request: ${request}\n\nSlot to reserve ${slotToReserve}`,
+                            `Rebooking booked slot. Request: ${prettyprint(
+                                request,
+                            )}\n\nSlot to reserve ${prettyprint(
+                                slotToReserve,
+                            )}`,
                         );
                     case 'FAILED_TO_BOOK_SLOT':
+                        shouldRemoveRequest = false;
                         logger.log(
-                            `Snipe failed. Request: ${request}\n\nSlot to reserve: ${slotToReserve}`,
+                            `Snipe failed. Request: ${prettyprint(
+                                request,
+                            )}\n\nSlot to reserve: ${prettyprint(
+                                slotToReserve,
+                            )}`,
                         );
                 }
-            }
 
-            return shouldRemoveRequest;
+                return {
+                    shouldRemoveRequest,
+                    bookedVenueId: null,
+                    bookedTimeWindow: null,
+                };
+            } else {
+                shouldRemoveRequest = true;
+                logger.log(
+                    `Snipe successful. Request: ${prettyprint(
+                        request,
+                    )}\n\nSlot to reserve: ${prettyprint(slotToReserve)}`,
+                );
+                return {
+                    shouldRemoveRequest,
+                    bookedVenueId: slotToReserve.id,
+                    bookedTimeWindow: {
+                        startTime: slotToReserve.startTime,
+                        endTime: slotToReserve.endTime,
+                    },
+                };
+            }
         }
 
-        return false;
+        return {
+            shouldRemoveRequest: false,
+            bookedVenueId: null,
+            bookedTimeWindow: null,
+        };
     }
 
     private activeReservationRequestStillValid(
@@ -169,6 +210,8 @@ export class ReservationRequestManager {
 
     public async markReservationRequestComplete(
         request: ActiveReservationRequest,
+        bookedVenueId: string,
+        bookedTimeWindow: ITimeWindow,
     ) {
         await UserModel.updateOne(
             {
@@ -177,7 +220,13 @@ export class ReservationRequestManager {
             },
             {
                 $set: {
-                    'reservationRequests.$.complete': true,
+                    'reservationRequests.$.bookedSlot': {
+                        venueId: bookedVenueId,
+                        timeWindow: {
+                            startTime: bookedTimeWindow.startTime,
+                            endTime: bookedTimeWindow.endTime,
+                        },
+                    },
                 },
             },
         );

@@ -129,7 +129,6 @@ export async function postRequestReservation(
         retryIntervalSeconds,
         timeWindows,
         partySizes,
-        complete: false,
     };
     const savedReservationRequest = await addReservationRequestForUser(
         username,
