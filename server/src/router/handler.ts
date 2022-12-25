@@ -82,6 +82,12 @@ export async function getSearch(
     return response;
 }
 
+export async function postValidateKeys(apiKey: string, authToken: string) {
+    // validate keys by making a search request
+    const response = await search(2, { apiKey, authToken }, 'ba');
+    return !response.err;
+}
+
 export async function getReservationRequests(username: string) {
     const user = await UserModel.findOne({ username: username }).select(
         'reservationRequests',

@@ -35,6 +35,13 @@ export function validatePostSearchEndpoint(req) {
     });
 }
 
+export function validatePostValidateKeysEndpoint(req) {
+    return validateRequestForRequiredParamsAndTypes(req.body, {
+        api_key: 'string',
+        auth_token: 'string',
+    });
+}
+
 export function validateGetReservationRequests(req) {
     return validateRequestForRequiredParamsAndTypes(req.query, {
         user_id: 'string',

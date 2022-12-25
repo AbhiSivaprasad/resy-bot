@@ -8,6 +8,7 @@ import {
     getUser,
     postRequestReservation,
     postUser,
+    postValidateKeys,
     putUser,
 } from './handler';
 import {
@@ -19,6 +20,7 @@ import {
     validatePostUser,
     validatePutUser,
     validatePostReservationRequestEndpoint,
+    validatePostValidateKeysEndpoint,
 } from './validate';
 
 export async function getUserEndpoint(req, res) {
@@ -110,6 +112,22 @@ export async function postSearchEndpoint(req, res) {
     }
 
     res.status(200).send(searchResults.val);
+}
+
+export async function postValidateKeysEndpoint(req, res) {
+    const result = validatePostValidateKeysEndpoint(req);
+    if (result.err) {
+        res.status(400).send(result.val);
+        return;
+    }
+
+    const { api_key, auth_token } = req.body;
+    const valid = await postValidateKeys(api_key, auth_token);
+    if (!valid) {
+        res.status(404).send('Invalid keys');
+    } else {
+        res.status(200).send('Valid keys');
+    }
 }
 
 export async function getAllUsersEndpoint(req, res) {

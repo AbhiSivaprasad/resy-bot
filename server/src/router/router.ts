@@ -9,6 +9,7 @@ import {
     getReservationRequestsEndpoint,
     deleteReservationRequestEndpoint,
     postReservationRequestEndpoint,
+    postValidateKeysEndpoint,
 } from './endpoints';
 
 export const router = express.Router();
@@ -63,6 +64,13 @@ router.get('/allUsers', getAllUsersEndpoint);
  * Proxy to Resy's search endpoint
  */
 router.post('/search', postSearchEndpoint);
+
+/**
+ * POST /validateKeys
+ * @param api_key: string
+ * @param auth_token: string
+ */
+router.post('/validateKeys', postValidateKeysEndpoint);
 
 /**
  * GET /reservationRequests
