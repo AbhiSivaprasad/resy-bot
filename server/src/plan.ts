@@ -43,6 +43,7 @@ export class ReservationRequestManager {
                         shouldRemoveRequest,
                         bookedVenueId,
                         bookedTimeWindow,
+                        bookedPartySize,
                     } = await this.requestReservation(request);
 
                     if (shouldRemoveRequest) {
@@ -55,12 +56,13 @@ export class ReservationRequestManager {
                         this.requests.splice(i, 1);
                     }
 
-                    if (bookedVenueId && bookedTimeWindow) {
+                    if (bookedVenueId && bookedTimeWindow && bookedPartySize) {
                         // booking was successful, mark the request as complete
                         await this.markReservationRequestComplete(
                             request,
                             bookedVenueId,
                             bookedTimeWindow,
+                            bookedPartySize,
                         );
                     } else {
                         // if the reservation was not successful, schedule a retry
@@ -128,6 +130,7 @@ export class ReservationRequestManager {
                     shouldRemoveRequest,
                     bookedVenueId: null,
                     bookedTimeWindow: null,
+                    bookedPartySize: null,
                 };
             } else {
                 shouldRemoveRequest = true;
@@ -143,6 +146,7 @@ export class ReservationRequestManager {
                         startTime: slotToReserve.startTime,
                         endTime: slotToReserve.endTime,
                     },
+                    bookedPartySize: slotToReserve.size,
                 };
             }
         }
@@ -151,6 +155,7 @@ export class ReservationRequestManager {
             shouldRemoveRequest: false,
             bookedVenueId: null,
             bookedTimeWindow: null,
+            bookedPartySize: null,
         };
     }
 
@@ -215,6 +220,7 @@ export class ReservationRequestManager {
         request: ActiveReservationRequest,
         bookedVenueId: string,
         bookedTimeWindow: ITimeWindow,
+        bookedPartySize: number,
     ) {
         await UserModel.updateOne(
             {
@@ -229,6 +235,7 @@ export class ReservationRequestManager {
                             startTime: bookedTimeWindow.startTime,
                             endTime: bookedTimeWindow.endTime,
                         },
+                        partySize: bookedPartySize,
                     },
                 },
             },
