@@ -58,7 +58,9 @@ function Signin() {
   return (
     <div className="flex flex-col items-center">
       <div className="container max-w-4xl flex flex-col items-center px-8">
-        <div className="text-2xl my-4">Just some setup for the first time.</div>
+        <div className="text-2xl my-4 text-center">
+          Just some setup for the first time.
+        </div>
         <div>
           <Step num={1}>
             Go to{" "}

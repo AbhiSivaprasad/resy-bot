@@ -35,8 +35,8 @@ function Nav() {
   };
   return (
     <div className="container">
-      <div className="flex flex-row justify-between items-center mx-8">
-        <div className=" my-2 flex flex-row space-x-4">
+      <div className="flex flex-row justify-between items-center mx-2 md:mx-8">
+        <div className=" my-2 flex flex-row md:space-x-4">
           {nav.map((item) => (
             <NavButton to={item.to} text={item.text} key={item.to} />
           ))}

@@ -36,7 +36,7 @@ function MyReservations() {
     setRequestToBeDeleted(null);
     let id = fetch(
       process.env.REACT_APP_SERVER_URL +
-        "/reservationRequests?reservation_id=" +
+        "/reservationRequest?reservation_id=" +
         requestToBeDeleted,
       {
         method: "DELETE",

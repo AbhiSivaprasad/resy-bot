@@ -146,7 +146,16 @@ function Reserve() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(query),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          console.log("bad sdearch");
+          alert(
+            "It looks like you entered your API keys incorrectly. Please go back to /signup and try again."
+          );
+        }
+      })
       .then((res) => setVenueSearchResults(res?.search?.hits));
   }, [venueSearchQuery]);
 
