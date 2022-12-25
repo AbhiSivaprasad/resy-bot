@@ -4,7 +4,7 @@
     "description": "resy bot",
     "main": "index.js",
     "scripts": {
-        "start": "nodemon --watch \"*.ts\" --exec \"ts-node\" ./src/app.ts",
+        "start": "nodemon --watch \"*.ts\" --exec \"ts-node\" ./src/main.ts",
         "test": "npx jest --testPathIgnorePatterns noauto --runInBand",
         "lint:fix": "eslint --fix"
     },
