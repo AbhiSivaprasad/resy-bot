@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import Home from "./pages/Home";
 import Reserve from "./pages/Reserve";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import Nav from "./components/Nav";
 import Signin from "./pages/Signin";
 import { useEffect } from "react";
@@ -33,7 +39,7 @@ function App() {
           setUser({ ...user, data });
           if (!data.keys?.apiKey || !data.keys?.authToken) {
             navigate("/signin");
-          } else {
+          } else if (window.location.pathname == "/") {
             navigate("/reservations");
           }
         });

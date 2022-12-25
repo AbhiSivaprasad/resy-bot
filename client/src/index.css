@@ -76,3 +76,7 @@ code {
   /* This is the blue color you see when you select text with the cursor */
   background-color: #3f83d5;
 }
+
+code {
+  @apply text-red-600 bg-gray-300 p-1 rounded-md text-sm;
+}

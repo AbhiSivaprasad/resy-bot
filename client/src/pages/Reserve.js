@@ -145,10 +145,11 @@ function Reserve() {
         longitude: location?.coords?.longitude,
       },
       per_page: 5,
-      party_size: 2,
+      partySize: 2,
       api_key: user?.data?.api_key,
       auth_token: user?.data?.auth_token,
       query: venueSearchQuery,
+      user_id: user?.data?.user_id,
     };
     fetch(process.env.REACT_APP_SERVER_URL + "/search", {
       method: "POST",
@@ -276,7 +277,7 @@ function Reserve() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="container flex flex-col items-center">
+      <div className="container px-4 lg:px-8 flex flex-col items-center">
         <ExpandableSection
           expandedStep={expandedStep}
           step={1}
@@ -325,7 +326,11 @@ function Reserve() {
             </div>
             <div className="mt-4">For a party of</div>
             <div className="max-w-54">
-              <Input numberRange={10} onSelect={setPartySize} />
+              <Input
+                placeholder="Party size..."
+                numberRange={10}
+                onSelect={setPartySize}
+              />
             </div>
           </div>
         </ExpandableSection>
@@ -359,6 +364,7 @@ function Reserve() {
                 <div className="flex flex-row items-center space-x-4">
                   <Input
                     className="w-32"
+                    placeholder="Start time..."
                     value={startTime}
                     onSelect={setStartTime}
                     options={TIME_OPTIONS}
@@ -367,6 +373,7 @@ function Reserve() {
 
                   <Input
                     className="w-32"
+                    placeholder="End time..."
                     value={endTime}
                     onSelect={setEndTime}
                     options={TIME_OPTIONS}
@@ -394,7 +401,10 @@ function Reserve() {
                 ></DatePicker>
               </div>
               <div className="flex flex-row justify-end text-right">
-                <Button onClick={() => setIsBasicPickerVisible(false)}>
+                <Button
+                  className="text-sm mt-1"
+                  onClick={() => setIsBasicPickerVisible(false)}
+                >
                   Use detailed picker
                 </Button>
               </div>

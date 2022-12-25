@@ -6,8 +6,8 @@ import { UserContext } from "../App";
 
 function Step(props) {
   return (
-    <div className="flex flex-row items-center text-lg my-2 space-x-4">
-      <div className="bg-red-500 p-4 rounded-full w-12 h-12 flex justify-center items-center text-white">
+    <div className="flex flex-row items-center lg:text-lg my-2 space-x-4">
+      <div className="grow-0 shrink-0 bg-red-500 text-xl rounded-full basis-10 h-10 border-10 flex justify-center items-center text-white">
         {props.num}
       </div>
       <div>{props.children}</div>
@@ -57,8 +57,8 @@ function Signin() {
   };
   return (
     <div className="flex flex-col items-center">
-      <div className="text-2xl my-4">Just some setup for the first time.</div>
-      <div className="container flex flex-col items-center">
+      <div className="container max-w-4xl flex flex-col items-center px-8">
+        <div className="text-2xl my-4">Just some setup for the first time.</div>
         <div>
           <Step num={1}>
             Go to{" "}
@@ -76,21 +76,22 @@ function Signin() {
             requests with name "user".
           </Step>
           <Step num={5}>
-            You should see "Request Url: https://api.resy.com/2/user" and
-            "Request Method: GET". Scroll down to Request Headers ->
-            authorization, and copy the text after api_key=
+            You should see{" "}
+            <code>"Request Url: https://api.resy.com/2/user"</code> and{" "}
+            <code>"Request Method: GET"</code>. Scroll down to authorization
+            (under Request Headers), and copy the text after api_key=
           </Step>
           <Input
-            className="my-1 ml-12"
+            className="my-1 pl-12"
             onChange={setApiKey}
             placeholder="Your api key..."
           ></Input>
           <Step num={6}>
-            Scroll down to the field titled "x-resy-auth-token" and paste the
-            contents below (this should be a longer string!)
+            Scroll down to the field titled <code>x-resy-auth-token</code> and
+            paste the contents below (this should be a longer string!)
           </Step>
           <Input
-            className="my-1 ml-12"
+            className="my-1 pl-12"
             onChange={setAuthToken}
             placeholder="Your auth token..."
           ></Input>
