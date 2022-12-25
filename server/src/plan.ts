@@ -4,6 +4,7 @@ import { ResyKeys } from './external/api';
 import { getSlots, reserveSlot } from './external/client';
 import { Slot } from './external/types';
 import { logger } from './logger';
+import { prettyprint } from './util';
 
 export interface ActiveReservationRequest extends IReservationRequest {
     keys: ResyKeys;
@@ -44,7 +45,9 @@ export class ReservationRequestManager {
                     if (reservationSuccessful) {
                         // remove request if the reservation was successful
                         logger.log(
-                            `successful reservation for ${request.userId}`,
+                            `successful reservation for ${prettyprint(
+                                request,
+                            )}`,
                         );
                         this.requests.splice(i, 1);
 
@@ -169,7 +172,7 @@ export class ReservationRequestManager {
     ) {
         await UserModel.updateOne(
             {
-                _id: request.userId,
+                username: request.userId,
                 'reservationRequests._id': request._id,
             },
             {
