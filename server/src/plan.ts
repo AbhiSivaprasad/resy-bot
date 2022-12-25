@@ -1,3 +1,4 @@
+import { UserModel } from './db/models/user/user.model';
 import { IReservationRequest, ITimeWindow } from './db/models/user/user.types';
 import { ResyKeys } from './external/api';
 import { getSlots, reserveSlot } from './external/client';
@@ -46,6 +47,9 @@ export class ReservationRequestManager {
                             `successful reservation for ${request.userId}`,
                         );
                         this.requests.splice(i, 1);
+
+                        // mark the request as complete
+                        await this.markReservationRequestComplete(request);
                     } else {
                         // if the reservation was not successful, schedule a retry
                         request.nextRetryTime = new Date();
@@ -159,6 +163,22 @@ export class ReservationRequestManager {
         const slotIsRightSize = partySizes.includes(slot.size);
         return slotIsInWindow && slotIsRightSize;
     };
+
+    public async markReservationRequestComplete(
+        request: ActiveReservationRequest,
+    ) {
+        await UserModel.updateOne(
+            {
+                _id: request.userId,
+                'reservationRequests._id': request._id,
+            },
+            {
+                $set: {
+                    'reservationRequests.$.complete': true,
+                },
+            },
+        );
+    }
 }
 
 // data structure to manage reservation requests
