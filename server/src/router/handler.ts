@@ -79,7 +79,7 @@ export async function getSearch(
     }
     const keys = user.keys;
     const response = await search(partySize, keys, query, location);
-    return Ok(response);
+    return response;
 }
 
 export async function getReservationRequests(username: string) {

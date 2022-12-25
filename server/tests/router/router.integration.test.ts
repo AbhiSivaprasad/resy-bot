@@ -91,6 +91,36 @@ describe('testing router', () => {
         await agent.delete('/user').send({ user_id: 'testuser' }).expect(200);
     });
 
+    it('test POST /search faulty input', async () => {
+        // create user
+        await agent.post('/user').send({
+            user_id: 'testuser',
+            concurrentLimit: 1,
+        });
+
+        // update user
+        await agent
+            .put('/user')
+            .send({
+                user_id: 'testuser',
+                api_key: 'bad api key',
+                auth_token: 'bad auth token',
+            })
+            .expect(200);
+
+        await agent
+            .post(`/search`)
+            .send({
+                user_id: 'testuser',
+                partySize: 2,
+                query: 'Joe',
+            })
+            .expect(404);
+
+        // delete user
+        await agent.delete('/user').send({ user_id: 'testuser' }).expect(200);
+    });
+
     it('test GET /allUsers', async () => {
         const userIds = await agent.get('/allUsers').expect(200);
         if (userIds.body.length > 0) {

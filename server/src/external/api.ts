@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import qs from 'qs';
+import { Err, Ok } from 'ts-results';
 import { GeoLocation } from './types';
 
 export const RESY_API_URL = 'https://api.resy.com/';
@@ -120,9 +121,12 @@ export const search = async (
         data: data,
     };
 
-    const response = await axios(config);
-
-    return response.data;
+    try {
+        const response = await axios(config);
+        return Ok(response.data);
+    } catch (error) {
+        return Err('API_KEYS_INVALID');
+    }
 };
 
 const buildHeaders = (headers, keys: ResyKeys, authtoken = true) => ({
