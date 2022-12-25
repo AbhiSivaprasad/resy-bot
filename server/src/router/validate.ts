@@ -1,52 +1,60 @@
 import { Err, Ok } from 'ts-results';
 
 export function validateGetUser(req) {
-    return validateRequestForRequiredParams(req.query, ['user_id']);
+    return validateRequestForRequiredParamsAndTypes(req.query, {
+        user_id: 'string',
+    });
 }
 
 export function validatePostUser(req) {
-    return validateRequestForRequiredParams(req.body, [
-        'user_id',
-        'concurrentLimit',
-    ]);
+    return validateRequestForRequiredParamsAndTypes(req.body, {
+        user_id: 'string',
+        concurrentLimit: 'number',
+    });
 }
 
 export function validatePutUser(req) {
-    return validateRequestForRequiredParams(req.body, [
-        'user_id',
-        'api_key',
-        'auth_token',
-    ]);
+    return validateRequestForRequiredParamsAndTypes(req.body, {
+        user_id: 'string',
+        api_key: 'string',
+        auth_token: 'string',
+    });
 }
 
 export function validateDeleteUser(req) {
-    return validateRequestForRequiredParams(req.body, ['user_id']);
+    return validateRequestForRequiredParamsAndTypes(req.body, {
+        user_id: 'string',
+    });
 }
 
 export function validatePostSearchEndpoint(req) {
-    return validateRequestForRequiredParams(req.body, [
-        'user_id',
-        'partySize',
-        'query',
-    ]);
+    return validateRequestForRequiredParamsAndTypes(req.body, {
+        user_id: 'string',
+        partySize: 'number',
+        query: 'any',
+    });
 }
 
 export function validateGetReservationRequests(req) {
-    return validateRequestForRequiredParams(req.query, ['user_id']);
+    return validateRequestForRequiredParamsAndTypes(req.query, {
+        user_id: 'string',
+    });
 }
 
 export function validateDeleteReservationRequest(req) {
-    return validateRequestForRequiredParams(req.body, ['reservation_id']);
+    return validateRequestForRequiredParamsAndTypes(req.body, {
+        reservation_id: 'string',
+    });
 }
 
 export function validatePostReservationRequestEndpoint(req) {
-    const valid = validateRequestForRequiredParams(req.body, [
-        'venues',
-        'user_id',
-        'partySizes',
-        'timeWindows',
-        'retryIntervalSeconds',
-    ]);
+    const valid = validateRequestForRequiredParamsAndTypes(req.body, {
+        venues: [{ id: 'string', metadata: 'any' }],
+        user_id: 'string',
+        partySizes: ['number'],
+        timeWindows: [{ startTime: 'date', endTime: 'date' }],
+        retryIntervalSeconds: 'number',
+    });
 
     if (valid.err) {
         return valid;
@@ -59,32 +67,8 @@ export function validatePostReservationRequestEndpoint(req) {
         return Err('No venues provided');
     } else if (timeWindows.length === 0) {
         return Err('No time windows provided');
-    } else if (venues.some((venue) => !venue.id)) {
-        return Err('At least one venue missing venueId');
-    } else if (
-        !Number.isFinite(retryIntervalSeconds) ||
-        !Number.isInteger(retryIntervalSeconds) ||
-        retryIntervalSeconds < 1
-    ) {
+    } else if (retryIntervalSeconds < 1) {
         return Err('Retry interval must be an integer > 1');
-    }
-
-    if (
-        timeWindows.some((window) => {
-            !window.startTime || !window.endTime;
-        })
-    ) {
-        return Err('At least one time slot missing required parameters');
-    }
-
-    return Ok(null);
-}
-
-function validateRequestForRequiredParams(requestObject, requiredParams) {
-    for (const param of requiredParams) {
-        if (!requestObject.hasOwnProperty(param)) {
-            return Err(`${param} is required`);
-        }
     }
 
     return Ok(null);
@@ -103,6 +87,8 @@ function validateRequestForRequiredParamsAndTypes(
             isNaN(Date.parse(requestObject))
             ? Err(`WRONG_TYPE`)
             : Ok(null);
+    } else if (requestTemplate === 'any') {
+        return Ok(null);
     } else if (Array.isArray(requestTemplate)) {
         let error = null;
         for (const item of requestObject) {
