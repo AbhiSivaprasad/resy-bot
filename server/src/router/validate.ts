@@ -74,6 +74,12 @@ export function validatePostReservationRequestEndpoint(req) {
     return Ok(null);
 }
 
+/**
+ * Validates that the request object has all the required params and that they are the correct type
+ * @param requestObject
+ * @param requestTemplate
+ * @returns
+ */
 function validateRequestForRequiredParamsAndTypes(
     requestObject,
     requestTemplate,
