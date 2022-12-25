@@ -30,6 +30,7 @@ export interface IVenue {
 
 export interface IBookedSlot {
     venueId: string;
+    partySize: number;
     timeWindow: ITimeWindow;
 }
 

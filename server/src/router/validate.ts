@@ -89,3 +89,69 @@ function validateRequestForRequiredParams(requestObject, requiredParams) {
 
     return Ok(null);
 }
+
+function validateRequestForRequiredParamsAndTypes(
+    requestObject,
+    requestTemplate,
+) {
+    if (requestTemplate === 'string' || requestTemplate === 'number') {
+        return typeof requestObject !== requestTemplate
+            ? Err(`WRONG_TYPE`)
+            : Ok(null);
+    } else if (requestTemplate === 'date') {
+        return typeof requestObject !== 'string' ||
+            isNaN(Date.parse(requestObject))
+            ? Err(`WRONG_TYPE`)
+            : Ok(null);
+    } else if (Array.isArray(requestTemplate)) {
+        let error = null;
+        for (const item of requestObject) {
+            const response = validateRequestForRequiredParamsAndTypes(
+                item,
+                requestTemplate[0],
+            );
+            if (response.err) {
+                error = response;
+                break;
+            }
+        }
+        return error ? error : Ok(null);
+    } else if (typeof requestTemplate == 'object') {
+        let error = null;
+        for (const [rawParamName, paramType] of Object.entries(
+            requestTemplate,
+        )) {
+            const required = rawParamName[-1] !== '?';
+            const paramName = required
+                ? rawParamName
+                : rawParamName.slice(0, -1);
+
+            if (required && !requestObject.hasOwnProperty(paramName)) {
+                error = Err(`${paramName} is required`);
+            } else if (required || requestObject.hasOwnProperty(paramName)) {
+                const response = validateRequestForRequiredParamsAndTypes(
+                    requestObject[paramName],
+                    paramType,
+                );
+                if (response.err) {
+                    switch (response.val) {
+                        case 'WRONG_TYPE':
+                            error = Err(`${paramName} has wrong type`);
+                            break;
+                        case 'UNKNOWN_TYPE':
+                            error = Err(`${paramName} has unknown type`);
+                            break;
+                        default:
+                            error = Err('Unexpected error');
+                            break;
+                    }
+                    break;
+                }
+            }
+        }
+
+        return error ? error : Ok(null);
+    } else {
+        return Err(`UNKNOWN_TYPE`);
+    }
+}
