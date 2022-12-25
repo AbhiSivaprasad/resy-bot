@@ -158,10 +158,15 @@ export async function postReservationRequestEndpoint(req, res) {
         return;
     }
 
-    const { user_id, venue_id, timeWindows, partySizes, retryIntervalSeconds } =
+    const { user_id, venues, timeWindows, partySizes, retryIntervalSeconds } =
         req.body;
 
-    const venueMetadata = req.body.venueMetadata || {};
+    venues.forEach((venue) => {
+        if (!venue.metadata) {
+            venue.metadata = {};
+        }
+    });
+
     timeWindows.forEach((timeWindow) => {
         timeWindow.startTime = new Date(timeWindow.startTime);
         timeWindow.endTime = new Date(timeWindow.endTime);
@@ -169,8 +174,7 @@ export async function postReservationRequestEndpoint(req, res) {
 
     const response = await postRequestReservation(
         user_id,
-        venue_id,
-        venueMetadata,
+        venues,
         retryIntervalSeconds,
         timeWindows,
         partySizes,

@@ -5,7 +5,11 @@ import {
     deleteReservationRequestForUser,
     getActiveRequestCountForUser,
 } from '../db/models/user/user.statics';
-import { ITimeWindow, IUserDocument } from '../db/models/user/user.types';
+import {
+    ITimeWindow,
+    IUserDocument,
+    IVenue,
+} from '../db/models/user/user.types';
 import { search } from '../external/api';
 import { GeoLocation } from '../external/types';
 import { reservationManager } from '../plan';
@@ -97,8 +101,7 @@ export async function deleteReservationRequest(
 
 export async function postRequestReservation(
     username,
-    venueId,
-    venueMetadata: any,
+    venues: IVenue[],
     retryIntervalSeconds,
     timeWindows: ITimeWindow[],
     partySizes: number[],
@@ -121,8 +124,7 @@ export async function postRequestReservation(
 
     // save the user's request
     const reservationRequest = {
-        venueId,
-        venueMetadata,
+        venues,
         expirationTime,
         retryIntervalSeconds,
         timeWindows,

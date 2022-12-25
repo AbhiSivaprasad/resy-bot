@@ -41,7 +41,7 @@ export function validateDeleteReservationRequest(req) {
 
 export function validatePostReservationRequestEndpoint(req) {
     const valid = validateRequestForRequiredParams(req.body, [
-        'venue_id',
+        'venues',
         'user_id',
         'partySizes',
         'timeWindows',
@@ -52,11 +52,15 @@ export function validatePostReservationRequestEndpoint(req) {
         return valid;
     }
 
-    const { partySizes, timeWindows, retryIntervalSeconds } = req.body;
+    const { venues, partySizes, timeWindows, retryIntervalSeconds } = req.body;
     if (partySizes.length === 0) {
         return Err('No party sizes provided');
+    } else if (venues.length === 0) {
+        return Err('No venues provided');
     } else if (timeWindows.length === 0) {
         return Err('No time windows provided');
+    } else if (venues.some((venue) => !venue.id)) {
+        return Err('At least one venue missing venueId');
     } else if (
         !Number.isFinite(retryIntervalSeconds) ||
         !Number.isInteger(retryIntervalSeconds) ||

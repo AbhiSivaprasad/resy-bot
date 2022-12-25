@@ -64,12 +64,19 @@ export class ReservationRequestManager {
     }
 
     public async requestReservation(request: ActiveReservationRequest) {
-        const slotToReserve = await this.findSuitableReservationRequest(
-            request.venueId,
-            request.partySizes,
-            request.timeWindows,
-            request.keys,
-        );
+        let slotToReserve = null;
+        for (const venue of request.venues) {
+            slotToReserve = await this.findSuitableReservationRequest(
+                venue.id,
+                request.partySizes,
+                request.timeWindows,
+                request.keys,
+            );
+
+            if (slotToReserve) {
+                break;
+            }
+        }
 
         if (slotToReserve) {
             const reservationResponse = await reserveSlot(

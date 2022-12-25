@@ -10,8 +10,7 @@ export interface IUser {
 
 export interface IReservationRequest {
     _id?: mongoose.Types.ObjectId;
-    venueId: string;
-    venueMetadata: any;
+    venues: IVenue[];
     timeWindows: ITimeWindow[];
     partySizes: number[];
     expirationTime: Date;
@@ -22,6 +21,11 @@ export interface IReservationRequest {
 export interface ITimeWindow {
     startTime: Date;
     endTime: Date;
+}
+
+export interface IVenue {
+    id: string;
+    metadata?: any;
 }
 
 export interface IUserDocument extends IUser, Document {}
