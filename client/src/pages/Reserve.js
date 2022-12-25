@@ -260,7 +260,7 @@ function Reserve() {
       !!endTime;
     let detailedComplete =
       isDetailedPickerVisible && detailedRanges?.length > 0;
-
+    console.log("party size", partySize);
     setFormComplete(
       !!partySize && venues?.length > 0 && (basicComplete || detailedComplete)
     );
@@ -331,6 +331,7 @@ function Reserve() {
               <Input
                 placeholder="Party size..."
                 numberRange={10}
+                value={partySize}
                 onSelect={setPartySize}
               />
             </div>
