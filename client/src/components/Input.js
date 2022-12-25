@@ -82,7 +82,7 @@ function Input(props) {
         disabled={props.disabled}
         onFocus={() => setFocused(true)}
         onBlur={() => setTimeout(() => setFocused(false), 200)}
-        className="border-2 px-4 py-2 rounded-full w-full"
+        className={`border-2 px-4 py-2 rounded-full w-full  }`}
       />
       {options && options.length > 0 && focused && (
         <div

@@ -70,7 +70,7 @@ function Reserve() {
   // form data
   let [startTime, setStartTime] = useState("");
   let [endTime, setEndTime] = useState("");
-  let [partySize, setPartySize] = useState(2);
+  let [partySize, setPartySize] = useState("");
   let [dates, setDates] = useState([]);
   let [detailedRanges, setDetailedRanges] = useState([]);
   let [venues, setVenues] = useState([]);
