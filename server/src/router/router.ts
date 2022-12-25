@@ -81,8 +81,7 @@ router.delete('/reservationRequest', deleteReservationRequestEndpoint);
 /**
  * POST /reserve
  * @param user_id: string
- * @param venue_id: string
- * @param venueMetadata: any
+ * @param venues: IVenue[]
  * @param timeWindows: ITimeWindow[]
  * @param partySizes: number[]
  * @param retryIntervalSeconds: number
