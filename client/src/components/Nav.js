@@ -9,7 +9,7 @@ const NavButton = (props) => (
       className={
         window.location.pathname == props.to
           ? "py-2 px-4 font-bold border-b-2 border-red-500"
-          : "py-2 px-4"
+          : "py-2 px-4 duration-100 hover:border-b-2"
       }
     >
       {props.text}
@@ -20,8 +20,9 @@ const NavButton = (props) => (
 function Nav() {
   const [user, setUser] = useContext(UserContext);
   let navigate = useNavigate();
+  console.log(user);
   let nav =
-    user?.data?.apiKey && user?.data?.authToken
+    user?.data?.keys?.apiKey && user?.data?.keys?.authToken
       ? [
           { to: "/reservations", text: "My Reservations" },
           { to: "/reserve", text: "Reserve" },
@@ -35,8 +36,8 @@ function Nav() {
   };
   return (
     <div className="container">
-      <div className="flex flex-row justify-between items-center">
-        <div className="ml-8 my-2 flex flex-row space-x-4">
+      <div className="flex flex-row justify-between items-center mx-8">
+        <div className=" my-2 flex flex-row space-x-4">
           {nav.map((item) => (
             <NavButton to={item.to} text={item.text} key={item.to} />
           ))}

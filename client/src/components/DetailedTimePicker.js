@@ -115,7 +115,6 @@ function DetailedTimePicker(props) {
       weekStart
     );
     selectedRanges.forEach(([start, end]) => {
-      console.log("start and end are", start, end);
       let dayOffset = differenceInCalendarDays(start, weekStart);
       console.log("dayoffset is", dayOffset);
       if (dayOffset >= 0 && dayOffset < 7) {
@@ -174,7 +173,7 @@ function DetailedTimePicker(props) {
         <tr>
           <td></td>
           {visibleDays.map((day) => (
-            <td disabled>
+            <td disabled className="border-b">
               <div className="text-center">{format(day, "E")}</div>
               <div style={{ lineHeight: "2rem" }} className="text-center">
                 {format(day, "L/d")}

@@ -52,6 +52,11 @@ function MyReservations() {
       minute: "2-digit",
     });
 
+  let dateString = (time) =>
+    time.toLocaleTimeString("en-us", {
+      year: "numeric",
+    });
+
   let displayRequest = (request) => (
     <div
       key={request.reservation_id}
@@ -65,12 +70,11 @@ function MyReservations() {
           {request.constraints?.windows &&
             request.constraints.windows
               .map((slot) => {
-                let startTime = new Date(slot.startTime);
-                return `On ${startTime.toLocaleDateString(
-                  "en-us"
-                )} bewteen ${timeString(startTime)} and ${timeString(
-                  new Date(slot.endTime)
-                )}`;
+                return `On ${dateString(
+                  new Date(slot.startTime)
+                )} bewteen ${timeString(
+                  new Date(slot.startTime)
+                )} and ${timeString(new Date(slot.endTime))}`;
               })
               .join(", ")}
         </div>

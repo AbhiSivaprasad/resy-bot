@@ -33,6 +33,15 @@ const TIME_OPTIONS = Array(96)
   ])
   .map((pair) => ({ name: pair[1], value: pair[0] }));
 
+let toJsDate = (date, timeIndex) =>
+  new Date(
+    date.year,
+    date.monthIndex,
+    date.day,
+    Math.floor(timeIndex / 4),
+    Math.round((timeIndex % 4) * 15)
+  );
+
 const MAX_VENUES_PER_REQUEST = 5;
 
 const ExpandableSection = (props) => {
@@ -59,9 +68,8 @@ function Reserve() {
   let navigate = useNavigate();
   let [expandedStep, setExpandedStep] = useState(1);
   // form data
-  let [selectedVenue, setSelectedVenue] = useState([]);
-  let [startTime, setStartTime] = useState(null);
-  let [endTime, setEndTime] = useState(null);
+  let [startTime, setStartTime] = useState("");
+  let [endTime, setEndTime] = useState("");
   let [partySize, setPartySize] = useState(2);
   let [dates, setDates] = useState([]);
   let [detailedRanges, setDetailedRanges] = useState([]);
@@ -84,26 +92,18 @@ function Reserve() {
 
     if (dates && startTime && endTime) {
       console.log("DATE START END", dates, startTime, endTime);
-      let to_js_date = (date, timeIndex) =>
-        new Date(
-          date.year,
-          date.monthIndex,
-          date.day,
-          Math.floor(timeIndex / 4),
-          Math.round((timeIndex % 4) * 15)
-        );
 
       setDetailedRanges(
         dates.map((date) => [
-          to_js_date(date, startTime.value),
-          to_js_date(date, endTime.value),
+          toJsDate(date, startTime.value),
+          toJsDate(date, endTime.value),
         ])
       );
       console.log(
         "have set detailed ranges to",
         dates.map((date) => [
-          to_js_date(date, startTime.value),
-          to_js_date(date, endTime.value),
+          toJsDate(date, startTime.value),
+          toJsDate(date, endTime.value),
         ])
       );
     } else {
@@ -125,7 +125,6 @@ function Reserve() {
     setDates([]);
     setStartTime(null);
     setEndTime(null);
-    console.log("setting basic picker visibility");
     setDetailedRanges([]);
     setIsBasicPickerVisible(true);
   }, [isDetailedPickerVisible]);
@@ -198,44 +197,39 @@ function Reserve() {
   // }
 
   let reserve = () => {
-    let slots = isBasicPickerVisible
+    let timeWindows = isBasicPickerVisible
       ? dates.map((date) => ({
-          date:
-            date.year +
-            "-" +
-            String(date.monthIndex).padStart(2, "0") +
-            "-" +
-            String(date.day).padStart(2, "0"),
-          start_time: startTime.value,
-          end_time: endTime.value,
+          startTime: toJsDate(date, startTime.value),
+          endTime: toJsDate(date, endTime.value),
         }))
       : detailedRanges.map((range) => ({
-          date: format(range[0], "yyyy-MM-dd"),
-          startTime: format(range[0], "HH:mm"),
-          endTime: format(range[1], "HH:mm"),
+          startTime: range[0],
+          endTime: range[1],
         }));
-    console.log("submitting slots", slots);
-    fetch(process.env.REACT_APP_SERVER_URL + "/reserve", {
+    fetch(process.env.REACT_APP_SERVER_URL + "/reservationRequest", {
       method: "post",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         user_id: user.data.user_id,
-        venue_ids: [selectedVenue.objectID],
-        retry_interval_seconds: 10,
-        party_size: partySize,
-        slots,
-        api_key: user.data.api_key,
-        auth_token: user.data.auth_token,
+        venues: venues.map((venue) => ({
+          id: venue.objectID,
+          metadata: venue,
+        })),
+        retryIntervalSeconds: 10,
+        partySizes: [partySize.value],
+        timeWindows,
       }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.status == "success") {
-          navigate("/reservations");
-        }
-      });
+    }).then((res) => {
+      if (res.ok) {
+        navigate("/reservations");
+      } else {
+        alert(
+          "Something went wrong. Please contact abhisivap@gmail.com for help."
+        );
+      }
+    });
   };
 
   // let isCollapsible = (ranges) => {
@@ -259,9 +253,14 @@ function Reserve() {
 
   useEffect(() => {
     let basicComplete =
-      isBasicPickerVisible && !!dates && !!startTime && !!endTime;
+      isBasicPickerVisible &&
+      !!dates &&
+      dates.length > 0 &&
+      !!startTime &&
+      !!endTime;
     let detailedComplete =
       isDetailedPickerVisible && detailedRanges?.length > 0;
+
     setFormComplete(
       !!partySize && venues?.length > 0 && (basicComplete || detailedComplete)
     );
@@ -278,6 +277,9 @@ function Reserve() {
   return (
     <div className="flex flex-col items-center">
       <div className="container px-4 lg:px-8 flex flex-col items-center">
+        <div className="text-3xl font-semibold my-8 text-center">
+          Let's find you a reservation...
+        </div>
         <ExpandableSection
           expandedStep={expandedStep}
           step={1}
@@ -288,7 +290,7 @@ function Reserve() {
           <div className="flex flex-col items-center">
             <div className="mb-2">Find me reservations at one of:</div>
             <Input
-              className="w-96"
+              className="w-full sm:w-96"
               resetAfterSelection
               autoFocus
               options={venueSearchResults}
@@ -361,7 +363,7 @@ function Reserve() {
                 <div className="whitespace-nowrap">
                   Get me reservations between
                 </div>
-                <div className="flex flex-row items-center space-x-4">
+                <div className="my-2 lg:my-0 flex flex-row items-center space-x-4">
                   <Input
                     className="w-32"
                     placeholder="Start time..."
@@ -383,7 +385,7 @@ function Reserve() {
                 <div></div>
                 <DatePicker
                   defaultValue={new Date()}
-                  min={new Date()}
+                  minDate={new Date()}
                   value={dates}
                   valueFormat={{ dateStyle: "medium" }}
                   onChange={(value) => setDates(value)}
@@ -403,6 +405,7 @@ function Reserve() {
               <div className="flex flex-row justify-end text-right">
                 <Button
                   className="text-sm mt-1"
+                  color="red"
                   onClick={() => setIsBasicPickerVisible(false)}
                 >
                   Use detailed picker
