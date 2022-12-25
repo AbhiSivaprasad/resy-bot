@@ -91,16 +91,7 @@ function Reserve() {
     if (isBasicPickerVisible) return;
 
     if (dates && startTime && endTime) {
-      console.log("DATE START END", dates, startTime, endTime);
-
       setDetailedRanges(
-        dates.map((date) => [
-          toJsDate(date, startTime.value),
-          toJsDate(date, endTime.value),
-        ])
-      );
-      console.log(
-        "have set detailed ranges to",
         dates.map((date) => [
           toJsDate(date, startTime.value),
           toJsDate(date, endTime.value),
@@ -155,7 +146,16 @@ function Reserve() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(query),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          console.log("bad sdearch");
+          alert(
+            "It looks like you entered your API keys incorrectly. Please go back to /signup and try again."
+          );
+        }
+      })
       .then((res) => setVenueSearchResults(res?.search?.hits));
   }, [venueSearchQuery]);
 
@@ -260,7 +260,6 @@ function Reserve() {
       !!endTime;
     let detailedComplete =
       isDetailedPickerVisible && detailedRanges?.length > 0;
-    console.log("party size", partySize);
     setFormComplete(
       !!partySize && venues?.length > 0 && (basicComplete || detailedComplete)
     );
