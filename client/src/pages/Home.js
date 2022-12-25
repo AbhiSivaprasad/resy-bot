@@ -10,7 +10,6 @@ function Home() {
   let [usernameError, setUsernameError] = useState("");
   const [user, setUser] = useContext(UserContext);
   let attemptSignIn = () => {
-    console.log("attempting signin");
     setUsernameError("");
 
     fetch(process.env.REACT_APP_SERVER_URL + "/user?user_id=" + username)
@@ -21,7 +20,6 @@ function Home() {
       .then((data) => {
         setUser({ ...user, data });
         localStorage.setItem("username", username);
-        console.log("data is", data);
         // likely haven't set this correctly
         if (
           !data?.keys?.apiKey ||

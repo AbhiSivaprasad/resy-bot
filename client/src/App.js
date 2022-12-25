@@ -35,7 +35,6 @@ function App() {
           }
         })
         .then((data) => {
-          console.log("data is", data);
           setUser({ ...user, data });
           if (!data.keys?.apiKey || !data.keys?.authToken) {
             navigate("/signin");

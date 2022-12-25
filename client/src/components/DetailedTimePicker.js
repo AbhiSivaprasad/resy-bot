@@ -60,13 +60,10 @@ function DetailedTimePicker(props) {
   }, [weekStart]);
 
   useEffect(() => {
-    console.log("selected ranges are now", selectedRanges);
     props.onChange(selectedRanges);
   }, [selectedRanges]);
 
-  useEffect(() => {
-    console.log("prop ranges are now", props.selectedRanges);
-  }, [props.selectedRanges]);
+  useEffect(() => {}, [props.selectedRanges]);
 
   let updateRanges = (newCells) => {
     let ranges = [];
@@ -108,15 +105,8 @@ function DetailedTimePicker(props) {
   // when the user moves back or forth a week, update the cells to reflect the new week's data.
   useEffect(() => {
     let newCells = empty_cells();
-    console.log(
-      "selected ranges are",
-      selectedRanges,
-      "new week start is",
-      weekStart
-    );
     selectedRanges.forEach(([start, end]) => {
       let dayOffset = differenceInCalendarDays(start, weekStart);
-      console.log("dayoffset is", dayOffset);
       if (dayOffset >= 0 && dayOffset < 7) {
         let m15PeriodOfStart = Math.round(
           4 * (getHours(start) + getMinutes(start) / 60)

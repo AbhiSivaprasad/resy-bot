@@ -20,7 +20,6 @@ const NavButton = (props) => (
 function Nav() {
   const [user, setUser] = useContext(UserContext);
   let navigate = useNavigate();
-  console.log(user);
   let nav =
     user?.data?.keys?.apiKey && user?.data?.keys?.authToken
       ? [

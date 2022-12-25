@@ -91,16 +91,7 @@ function Reserve() {
     if (isBasicPickerVisible) return;
 
     if (dates && startTime && endTime) {
-      console.log("DATE START END", dates, startTime, endTime);
-
       setDetailedRanges(
-        dates.map((date) => [
-          toJsDate(date, startTime.value),
-          toJsDate(date, endTime.value),
-        ])
-      );
-      console.log(
-        "have set detailed ranges to",
         dates.map((date) => [
           toJsDate(date, startTime.value),
           toJsDate(date, endTime.value),
@@ -260,7 +251,6 @@ function Reserve() {
       !!endTime;
     let detailedComplete =
       isDetailedPickerVisible && detailedRanges?.length > 0;
-    console.log("party size", partySize);
     setFormComplete(
       !!partySize && venues?.length > 0 && (basicComplete || detailedComplete)
     );

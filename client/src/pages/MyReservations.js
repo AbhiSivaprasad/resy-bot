@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { useContext } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -46,17 +47,38 @@ function MyReservations() {
       });
   };
 
-  let timeString = (time) =>
-    time.toLocaleTimeString("en-us", {
-      hour: "numeric",
-      minute: "2-digit",
-    });
+  let combineWithOr = (arr) => {
+    if (arr.length === 1) return arr[0];
+    const firsts = arr.slice(0, arr.length - 1);
+    const last = arr[arr.length - 1];
+    return firsts.join(", ") + " or " + last;
+  };
 
-  let dateString = (time) =>
-    time.toLocaleTimeString("en-us", {
-      month: "short",
-      day: "numeric",
-    });
+  let timeWindowString = (windows) => {
+    let timeString = (time) => format(new Date(time), "K:mmaaa");
+    let dateString = (time) => format(new Date(time), "MMM dd");
+
+    const allEqual = (arr) => arr.every((v) => v === arr[0]);
+    const startTimes = windows.map((window) => timeString(window.startTime));
+    const endTimes = windows.map((window) => timeString(window.endTime));
+    if (allEqual(startTimes) && allEqual(endTimes)) {
+      return `On ${combineWithOr(
+        windows.map((window) => dateString(window.startTime))
+      )} between ${startTimes[0]} and ${endTimes[0]}`;
+    } else {
+      return (
+        "On " +
+        combineWithOr(
+          windows.map(
+            (window) =>
+              `${dateString(window.startTime)} between ${timeString(
+                window.startTime
+              )} and ${timeString(window.endTime)}`
+          )
+        )
+      );
+    }
+  };
 
   let displayRequest = (request) => (
     <div
@@ -66,18 +88,13 @@ function MyReservations() {
       <div className="flex flex-row items-center w-full space-x-4">
         <div className="flex-grow">
           <div className="flex flex-row items-center space-x-4">
-            <div>Venues: {request.venueId}</div>
+            <div className="font-bold">
+              {combineWithOr(
+                request.venues.map((venue) => venue.metadata.name)
+              )}
+            </div>
           </div>
-          {request.timeWindows &&
-            request.timeWindows
-              .map((slot) => {
-                return `On ${dateString(
-                  new Date(slot.startTime)
-                )} bewteen ${timeString(
-                  new Date(slot.startTime)
-                )} and ${timeString(new Date(slot.endTime))}`;
-              })
-              .join(", ")}
+          {timeWindowString(request.timeWindows)}
           <span> for a party of </span>
           {request.partySizes[0]}
         </div>
@@ -91,10 +108,12 @@ function MyReservations() {
     <div>
       {requestToBeDeleted && (
         <Popup
-          text="Are you sure you want to delete this reservation request? This cannot be undone."
           onSubmit={deleteRequest}
           onCancel={() => setRequestToBeDeleted(null)}
-        ></Popup>
+        >
+          Are you sure you want to delete this reservation request? This cannot
+          be undone.
+        </Popup>
       )}
       <div className="flex flex-col items-center ">
         <div className="container flex flex-col">
