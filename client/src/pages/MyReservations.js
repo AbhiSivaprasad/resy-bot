@@ -11,11 +11,11 @@ function MyReservations() {
   let [completedRequests, setCompletedRequests] = useState([]);
   const [user, setUser] = useContext(UserContext);
   useEffect(() => {
-    if (user?.data?.userId) {
+    if (user?.data?.user_id) {
       fetch(
         process.env.REACT_APP_SERVER_URL +
-          "/requests?user_id=" +
-          user?.data?.userId
+          "/reservationRequests?user_id=" +
+          user?.data?.user_id
       )
         .then((res) => res.json())
         .then((res) => {
@@ -32,7 +32,7 @@ function MyReservations() {
     setRequestToBeDeleted(null);
     let id = fetch(
       process.env.REACT_APP_SERVER_URL +
-        "/request?reservation_id=" +
+        "/reservationRequests?reservation_id=" +
         requestToBeDeleted,
       {
         method: "DELETE",

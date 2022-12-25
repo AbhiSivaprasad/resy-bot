@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import MyReservations from "./pages/MyReservations";
 import { DateTimePicker } from "react-widgets";
 import DetailedTimePicker from "./components/DetailedTimePicker";
+import Admin from "./pages/Admin";
 const title = "Navigation Bar";
 export const UserContext = React.createContext("");
 function App() {
@@ -22,15 +23,22 @@ function App() {
       )
         .then((res) => {
           if (res.ok) return res.json();
-          else throw new Error("Status code error :" + res.status);
+          else {
+            localStorage.removeItem("username");
+            throw new Error("Status code error :" + res.status);
+          }
         })
         .then((data) => {
           console.log("data is", data);
           setUser({ ...user, data });
-          navigate("/reservations");
+          if (!data.keys?.apiKey || !data.keys?.authToken) {
+            navigate("/signin");
+          } else {
+            navigate("/reservations");
+          }
         });
     } else {
-      navigate("/");
+      //navigate("/");
     }
   }, []);
   return (
@@ -41,6 +49,7 @@ function App() {
         <Route path="reserve" element={<Reserve />} />
         <Route path="reservations" element={<MyReservations />} />
         <Route path="signin" element={<Signin />} />
+        <Route path="swan" element={<Admin />} />
       </Routes>
     </UserContext.Provider>
   );

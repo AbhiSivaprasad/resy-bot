@@ -16,29 +16,31 @@ function Step(props) {
 }
 function Signin() {
   const [user, setUser] = useContext(UserContext);
+
   let navigate = useNavigate();
   let [apiKey, setApiKey] = useState("");
   let [authToken, setAuthToken] = useState("");
   let postUser = () => {
+    console.log("user id is", user.data.user_id);
     fetch(process.env.REACT_APP_SERVER_URL + "/user", {
-      method: "post",
+      method: "put",
       headers: {
         "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: JSON.stringify({
-        user_id: user.data.userId,
+        user_id: user.data.user_id,
         api_key: apiKey,
         auth_token: authToken,
       }),
     })
       .then((res) => res.text())
       .then((res) => {
-        if (res == "success") {
+        if (res == "Update successful") {
           fetch(
             process.env.REACT_APP_SERVER_URL +
               "/user?user_id=" +
-              user.data.userId
+              user.data.user_id
           )
             .then((res) => {
               if (res.ok) return res.json();
@@ -46,7 +48,7 @@ function Signin() {
             })
             .then((data) => {
               setUser({ ...user, data });
-              localStorage.setItem("username", user.data.userId);
+              localStorage.setItem("username", user.data.user);
               navigate("/reservations");
             });
           navigate("/reservations");

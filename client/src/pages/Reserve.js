@@ -220,7 +220,7 @@ function Reserve() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        user_id: user.data.userId,
+        user_id: user.data.user_id,
         venue_ids: [selectedVenue.objectID],
         retry_interval_seconds: 10,
         party_size: partySize,

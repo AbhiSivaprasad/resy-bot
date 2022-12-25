@@ -20,12 +20,13 @@ const NavButton = (props) => (
 function Nav() {
   const [user, setUser] = useContext(UserContext);
   let navigate = useNavigate();
-  let nav = user?.data
-    ? [
-        { to: "/reservations", text: "My Reservations" },
-        { to: "/reserve", text: "Reserve" },
-      ]
-    : [{ to: "/", text: "Home" }];
+  let nav =
+    user?.data?.apiKey && user?.data?.authToken
+      ? [
+          { to: "/reservations", text: "My Reservations" },
+          { to: "/reserve", text: "Reserve" },
+        ]
+      : [{ to: "/", text: "Home" }];
 
   let logout = () => {
     localStorage.removeItem("username");
