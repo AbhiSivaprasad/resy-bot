@@ -120,7 +120,7 @@ function validateRequestForRequiredParamsAndTypes(
         for (const [rawParamName, paramType] of Object.entries(
             requestTemplate,
         )) {
-            const required = rawParamName[-1] !== '?';
+            const required = rawParamName[rawParamName.length - 1] !== '?';
             const paramName = required
                 ? rawParamName
                 : rawParamName.slice(0, -1);
@@ -141,7 +141,8 @@ function validateRequestForRequiredParamsAndTypes(
                             error = Err(`${paramName} has unknown type`);
                             break;
                         default:
-                            error = Err('Unexpected error');
+                            console.log(error);
+                            error = Err(`Unexpected error ${response.val}`);
                             break;
                     }
                     break;

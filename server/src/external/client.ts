@@ -37,7 +37,7 @@ export const getSlots = async (
         }),
     );
 
-    return processedSlots;
+    return Ok(processedSlots);
 };
 
 export const reserveSlot = async (
