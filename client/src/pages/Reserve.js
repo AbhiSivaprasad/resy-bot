@@ -156,7 +156,15 @@ function Reserve() {
           );
         }
       })
-      .then((res) => setVenueSearchResults(res?.search?.hits));
+      .then((res) =>
+        setVenueSearchResults(
+          !!res?.search?.hits &&
+            res.search.hits.filter(
+              (hit) =>
+                !venues.map((venue) => venue.objectID).includes(hit.objectID)
+            )
+        )
+      );
   }, [venueSearchQuery]);
 
   //the code below was supposed to crunch the detailed view back into the normal view, but who needs this anyway.
