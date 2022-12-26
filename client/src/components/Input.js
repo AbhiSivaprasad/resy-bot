@@ -4,12 +4,12 @@ function Input(props) {
   let color = props.color || "red";
   let textColor = props.textColor || "white";
 
-  const optionsRef = useRef(0);
-  useEffect(() => {
-    if (focused) {
-      console.log(optionsRef);
-    }
-  }, [focused]);
+  // const optionsRef = useRef(0);
+  // useEffect(() => {
+  //   if (focused) {
+  //     console.log(optionsRef);
+  //   }
+  // }, [focused]);
   let [value, setValue] = useState(props.value);
   let changeHandler = (event) => {
     setValue(event.target.value);
@@ -89,7 +89,6 @@ function Input(props) {
         <div
           className="absolute z-10 w-full rounded-b-3xl border top-10 overflow-y-scroll"
           style={{ maxHeight: "300px" }}
-          ref={optionsRef}
         >
           <div className="bg-white">{options.map(displayResultHandler)}</div>
         </div>
