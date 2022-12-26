@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 const resy_logo = require("../img/resy_logo.png");
 function Input(props) {
   let color = props.color || "red";
   let textColor = props.textColor || "white";
 
-  // this is so that we can set the initial value from the controlling component
-  // let initValue =
-  //   typeof props.value == "number" && props.options
-  //     ? props.options[props.value]
-  //     : "";
+  const optionsRef = useRef(0);
+  useEffect(() => {
+    if (focused) {
+      console.log(optionsRef);
+    }
+  }, [focused]);
   let [value, setValue] = useState(props.value);
   let changeHandler = (event) => {
     setValue(event.target.value);
@@ -88,6 +89,7 @@ function Input(props) {
         <div
           className="absolute z-10 w-full rounded-b-3xl border top-10 overflow-y-scroll"
           style={{ maxHeight: "300px" }}
+          ref={optionsRef}
         >
           <div className="bg-white">{options.map(displayResultHandler)}</div>
         </div>

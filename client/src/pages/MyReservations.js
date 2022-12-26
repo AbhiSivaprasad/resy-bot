@@ -23,8 +23,8 @@ function MyReservations() {
       )
         .then((res) => res.json())
         .then((res) => {
-          setPendingRequests(res.filter((item) => !item.complete));
-          setCompletedRequests(res.filter((item) => item.complete));
+          setPendingRequests(res.filter((item) => !item.bookedSlot));
+          setCompletedRequests(res.filter((item) => item.bookedSlot));
         });
     }
   }, [user]);
@@ -84,24 +84,27 @@ function MyReservations() {
   };
 
   let displayRequest = (request) => (
-    <div
-      key={request.reservation_id}
-      className="w-full border border-gray-100 p-4"
-    >
+    <div key={request._id} className="w-full border border-gray-100 p-4">
       <div className="flex flex-row items-center w-full space-x-4">
         <div className="flex-grow">
           <div className="flex flex-row items-center space-x-4">
             <div className="font-bold">
-              {combineWithOr(
-                request.venues.map((venue) => venue.metadata.name)
-              )}
+              {request.bookedSlot
+                ? request.venues.find(
+                    (venue) => venue.id == request.bookedSlot.venueId
+                  )?.metadata?.name || "Venue name not found"
+                : combineWithOr(
+                    request.venues.map((venue) => venue.metadata.name)
+                  )}
             </div>
           </div>
-          {timeWindowString(request.timeWindows)}
+          {timeWindowString(
+            [request.bookedSlot?.timeWindow] || request.timeWindows
+          )}
           <span> for a party of </span>
-          {request.partySizes[0]}
+          {request.bookedSlot?.partySize || request.partySizes[0]}
         </div>
-        {request.complete ? (
+        {request.bookedSlot ? (
           <img
             src={resy_logo}
             width="80px"
@@ -138,9 +141,12 @@ function MyReservations() {
             </Link>
           </div>
           <div className="text-xl m-4 mt-10 font-semibold">
-            Completed Reservation Requests
+            Upcoming Reservations
           </div>
           {completedRequests.map(displayRequest)}
+          <div className="text-xl m-4 mt-10 font-semibold">
+            Past Reservations
+          </div>
         </div>
       </div>
     </div>

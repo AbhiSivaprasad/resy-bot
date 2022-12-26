@@ -22,36 +22,54 @@ function Signin() {
   let [authToken, setAuthToken] = useState("");
   let postUser = () => {
     console.log("user id is", user.data.user_id);
-    fetch(process.env.REACT_APP_SERVER_URL + "/user", {
-      method: "put",
+    fetch(process.env.REACT_APP_SERVER_URL + "/validateKeys", {
+      method: "post",
       headers: {
         "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: JSON.stringify({
-        user_id: user.data.user_id,
         api_key: apiKey,
         auth_token: authToken,
       }),
     })
       .then((res) => res.text())
       .then((res) => {
-        if (res == "Update successful") {
-          fetch(
-            process.env.REACT_APP_SERVER_URL +
-              "/user?user_id=" +
-              user.data.user_id
-          )
+        if (res == "Valid keys") {
+          fetch(process.env.REACT_APP_SERVER_URL + "/user", {
+            method: "put",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user_id: user.data.user_id,
+              api_key: apiKey,
+              auth_token: authToken,
+            }),
+          })
+            .then((res) => res.text())
             .then((res) => {
-              if (res.ok) return res.json();
-              else throw new Error("Status code error :" + res.status);
-            })
-            .then((data) => {
-              setUser({ ...user, data });
-              localStorage.setItem("username", user.data.user);
-              navigate("/reservations");
+              if (res == "Update successful") {
+                fetch(
+                  process.env.REACT_APP_SERVER_URL +
+                    "/user?user_id=" +
+                    user.data.user_id
+                )
+                  .then((res) => {
+                    if (res.ok) return res.json();
+                    else throw new Error("Status code error :" + res.status);
+                  })
+                  .then((data) => {
+                    setUser({ ...user, data });
+                    localStorage.setItem("username", user.data.user);
+                    navigate("/reservations");
+                  });
+                navigate("/reservations");
+              }
             });
-          navigate("/reservations");
+        } else {
+          alert(
+            "Your keys are invalid! Try again, or contact abhisivap@gmail.com if you can't get your keys to work"
+          );
         }
       });
   };
