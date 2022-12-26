@@ -96,6 +96,12 @@ export const bookSlot = async (bookToken: string, keys: ResyKeys) => {
         const response = await axios(config).catch((error) => error.response);
         return Ok(response.data);
     } catch (error) {
+        console.log(error);
+
+        if (error.message && error.message === 'Payment Required') {
+            return Err('PAYMENT_REQUIRED');
+        }
+
         return Err('API_KEYS_INVALID');
     }
 };
