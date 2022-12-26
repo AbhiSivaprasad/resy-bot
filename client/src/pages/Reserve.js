@@ -330,6 +330,7 @@ function Reserve() {
               <Input
                 placeholder="Party size..."
                 numberRange={10}
+                readOnly
                 value={partySize}
                 onSelect={setPartySize}
               />
@@ -369,6 +370,7 @@ function Reserve() {
                     placeholder="Start time..."
                     value={startTime}
                     onSelect={setStartTime}
+                    readOnly
                     options={TIME_OPTIONS}
                   ></Input>
                   <div className="whitespace-nowrap">and</div>

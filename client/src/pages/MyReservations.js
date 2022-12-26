@@ -1,14 +1,14 @@
-import { format } from 'date-fns';
-import { useContext } from 'react';
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { UserContext } from '../App';
-import Button from '../components/Button';
-import Popup from '../components/Popup';
-const resy_logo = require('../img/resy_logo.png');
+import { format } from "date-fns";
+import { useContext } from "react";
+import { useEffect } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { UserContext } from "../App";
+import Button from "../components/Button";
+import Popup from "../components/Popup";
+const resy_logo = require("../img/resy_logo.png");
 const RESY_RESERVATIONS_LINK =
-  'https://resy.com/account/reservations-and-notify';
+  "https://resy.com/account/reservations-and-notify";
 
 function MyReservations() {
   let [pendingRequests, setPendingRequests] = useState([]);
@@ -18,7 +18,7 @@ function MyReservations() {
     if (user?.data?.user_id) {
       fetch(
         process.env.REACT_APP_SERVER_URL +
-          '/reservationRequests?user_id=' +
+          "/reservationRequests?user_id=" +
           user?.data?.user_id
       )
         .then((res) => res.json())
@@ -36,12 +36,12 @@ function MyReservations() {
     setRequestToBeDeleted(null);
     let id = fetch(
       process.env.REACT_APP_SERVER_URL +
-        '/reservationRequest?reservation_id=' +
+        "/reservationRequest?reservation_id=" +
         requestToBeDeleted +
-        '&user_id=' +
+        "&user_id=" +
         user?.data?.user_id,
       {
-        method: 'DELETE',
+        method: "DELETE",
       }
     )
       .then((res) => res.text())
@@ -56,12 +56,12 @@ function MyReservations() {
     if (arr.length === 1) return arr[0];
     const firsts = arr.slice(0, arr.length - 1);
     const last = arr[arr.length - 1];
-    return firsts.join(', ') + ' or ' + last;
+    return firsts.join(", ") + " or " + last;
   };
 
   let timeWindowString = (windows) => {
-    let timeString = (time) => format(new Date(time), 'K:mmaaa');
-    let dateString = (time) => format(new Date(time), 'MMM dd');
+    let timeString = (time) => format(new Date(time), "K:mmaaa");
+    let dateString = (time) => format(new Date(time), "MMM dd");
 
     const allEqual = (arr) => arr.every((v) => v === arr[0]);
     const startTimes = windows.map((window) => timeString(window.startTime));
@@ -72,7 +72,7 @@ function MyReservations() {
       )} between ${startTimes[0]} and ${endTimes[0]}`;
     } else {
       return (
-        'On ' +
+        "On " +
         combineWithOr(
           windows.map(
             (window) =>
@@ -100,14 +100,18 @@ function MyReservations() {
                   )}
             </div>
           </div>
-          {timeWindowString(
-            [request.bookedSlot?.timeWindow] || request.timeWindows
-          )}
+          {request.bookedSlot
+            ? format(
+                new Date(request.bookedSlot.timeWindow.startTime),
+                "MMM dd, K:mmaa"
+              )
+            : timeWindowString(request.timeWindows)}
           <span> for a party of </span>
           {request.bookedSlot?.partySize || request.partySizes[0]}
         </div>
         {request.bookedSlot ? (
           <img
+            className="cursor-pointer"
             src={resy_logo}
             width="80px"
             onClick={() => window.open(RESY_RESERVATIONS_LINK)}
@@ -145,10 +149,21 @@ function MyReservations() {
           <div className="text-xl m-4 mt-10 font-semibold">
             Upcoming Reservations
           </div>
-          {completedRequests.map(displayRequest)}
+          {completedRequests
+            .filter(
+              (request) =>
+                new Date(request.bookedSlot.timeWindow.startTime) > new Date()
+            )
+            .map(displayRequest)}
           <div className="text-xl m-4 mt-10 font-semibold">
             Past Reservations
           </div>
+          {completedRequests
+            .filter(
+              (request) =>
+                new Date(request.bookedSlot.timeWindow.startTime) < new Date()
+            )
+            .map(displayRequest)}
         </div>
       </div>
     </div>
