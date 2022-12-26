@@ -307,11 +307,11 @@ function Reserve() {
               }
               disabled={venues.length >= MAX_VENUES_PER_REQUEST}
             ></Input>
-            <div className="p-4 flex flex-row space-x-2 flex-wrap text-white">
+            <div className="p-4 flex flex-row justify-center space-x-2 flex-wrap text-white">
               {venues.map((venue) => (
                 <div
                   key={venue.name}
-                  className="flex flex-row align-center bg-red-500 rounded-md space-x-2"
+                  className="my-1 flex flex-row align-center bg-red-500 rounded-md space-x-2"
                 >
                   <div className="py-1 pl-2">{venue.name}</div>
                   <button

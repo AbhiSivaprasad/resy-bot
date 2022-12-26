@@ -146,8 +146,12 @@ function MyReservations() {
               <Button className="w-72">Make a Reservation</Button>
             </Link>
           </div>
-          <div className="text-xl m-4 mt-10 font-semibold">
-            Upcoming Reservations
+          <div className="m-4 mt-10">
+            <div className="text-xl font-semibold">Upcoming Reservations</div>
+            <div className="text-gray-500 text-sm">
+              If you'd like to cancel, cancel through resy. The reservation will
+              still show up here, but it will have been cancelled.
+            </div>
           </div>
           {completedRequests
             .filter(
