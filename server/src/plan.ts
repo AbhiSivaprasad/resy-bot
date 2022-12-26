@@ -28,7 +28,7 @@ export class ReservationRequestManager {
 
     public removeReservationRequest(requestId) {
         this.requests = this.requests.filter(
-            (request) => request._id == requestId,
+            (request) => request._id !== requestId,
         );
     }
 
@@ -38,7 +38,6 @@ export class ReservationRequestManager {
 
     public async requestReservations() {
         // iterate in reverse to enable safe deletion of finished requests
-        console.log(this.requests);
         for (let i = this.requests.length - 1; i >= 0; i--) {
             const request = this.requests[i];
             if (this.activeReservationRequestStillValid(request)) {
@@ -53,11 +52,7 @@ export class ReservationRequestManager {
 
                     if (shouldRemoveRequest) {
                         // remove request from queue
-                        logger.log(
-                            `successful reservation for ${prettyprint(
-                                request,
-                            )}`,
-                        );
+                        logger.log(`successful reservation for ${request._id}`);
                         this.requests.splice(i, 1);
                     }
 
@@ -80,7 +75,9 @@ export class ReservationRequestManager {
                 }
             } else {
                 // remove request if reservation was unsuccessful but expiration time has passed
-                logger.log('expiration time passed, removing');
+                logger.log(
+                    `expiration time passed, removing request ${request._id}`,
+                );
                 this.requests.splice(i, 1);
             }
         }
@@ -116,20 +113,16 @@ export class ReservationRequestManager {
                     case 'SLOT_ALREADY_BOOKED':
                         shouldRemoveRequest = true;
                         logger.log(
-                            `Rebooking booked slot. Request: ${prettyprint(
-                                request,
-                            )}\n\nSlot to reserve ${prettyprint(
-                                slotToReserve,
-                            )}`,
+                            `Rebooking booked slot. Request: ${
+                                request._id
+                            }\nSlot to reserve ${prettyprint(slotToReserve)}`,
                         );
                     case 'FAILED_TO_BOOK_SLOT':
                         shouldRemoveRequest = false;
                         logger.log(
-                            `Snipe failed. Request: ${prettyprint(
-                                request,
-                            )}\n\nSlot to reserve: ${prettyprint(
-                                slotToReserve,
-                            )}`,
+                            `Snipe failed. Request: ${
+                                request._id
+                            }\nSlot to reserve: ${prettyprint(slotToReserve)}`,
                         );
                 }
 

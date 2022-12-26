@@ -102,6 +102,7 @@ export async function deleteReservationRequest(
     username: string,
     reservationId: string,
 ) {
+    reservationManager.removeReservationRequest(reservationId);
     return await deleteReservationRequestForUser(username, reservationId);
 }
 
