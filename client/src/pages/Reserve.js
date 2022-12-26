@@ -378,6 +378,7 @@ function Reserve() {
                     placeholder="Start time..."
                     value={startTime}
                     onSelect={setStartTime}
+                    defaultScrollPos={1967}
                     readOnly
                     options={TIME_OPTIONS}
                   ></Input>
@@ -387,6 +388,7 @@ function Reserve() {
                     className="w-32"
                     placeholder="End time..."
                     value={endTime}
+                    defaultScrollPos={1967}
                     onSelect={setEndTime}
                     options={TIME_OPTIONS}
                   ></Input>

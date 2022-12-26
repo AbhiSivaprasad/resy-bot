@@ -4,12 +4,8 @@ function Input(props) {
   let color = props.color || "red";
   let textColor = props.textColor || "white";
 
-  // const optionsRef = useRef(0);
-  // useEffect(() => {
-  //   if (focused) {
-  //     console.log(optionsRef);
-  //   }
-  // }, [focused]);
+  const optionsRef = useRef(0);
+
   let [value, setValue] = useState(props.value);
   let changeHandler = (event) => {
     setValue(event.target.value);
@@ -22,6 +18,11 @@ function Input(props) {
       }))
     : props.options;
   let [focused, setFocused] = useState(false);
+  useEffect(() => {
+    if (props.defaultScrollPos && focused == true) {
+      optionsRef.current.scrollTop = props.defaultScrollPos;
+    }
+  }, [focused]);
   let selectResultHandler = (item) => {
     setValue(props.resetAfterSelection ? "" : item.name);
     setFocused(false);
@@ -37,7 +38,7 @@ function Input(props) {
       return (
         <div
           className="cursor-pointer border-b hover:bg-gray-200 duration-100 flex flex-row items-center pr-4"
-          key={item.name}
+          key={"option-" + item.name}
           onClick={() => selectResultHandler(item)}
         >
           <img
@@ -60,6 +61,7 @@ function Input(props) {
         <div
           className="cursor-pointer border-b hover:bg-gray-200 duration-100"
           key={item.name}
+          id={"option-" + props.name + "-" + item.name}
           onClick={() => selectResultHandler(item)}
         >
           <div className="px-4 py-2">{item.name}</div>
@@ -83,11 +85,12 @@ function Input(props) {
         disabled={props.disabled}
         readOnly={props.readOnly}
         onFocus={() => setFocused(true)}
-        onBlur={() => setTimeout(() => setFocused(false), 200)}
+        onBlur={() => setTimeout(() => setFocused(true), 200)}
         className={`border-2 px-4 py-2 rounded-full w-full  }`}
       />
       {options && options.length > 0 && focused && (
         <div
+          ref={optionsRef}
           className="absolute z-10 w-full rounded-b-3xl border top-10 overflow-y-scroll"
           style={{ maxHeight: "300px" }}
         >
