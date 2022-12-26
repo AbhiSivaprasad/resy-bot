@@ -22,6 +22,10 @@ export class ReservationRequestManager {
         this.requests.push(request);
     }
 
+    public addReservationRequests(requests: ActiveReservationRequest[]) {
+        this.requests = [...this.requests, ...requests];
+    }
+
     public removeReservationRequest(requestId) {
         this.requests = this.requests.filter(
             (request) => request._id == requestId,
@@ -34,6 +38,7 @@ export class ReservationRequestManager {
 
     public async requestReservations() {
         // iterate in reverse to enable safe deletion of finished requests
+        console.log(this.requests);
         for (let i = this.requests.length - 1; i >= 0; i--) {
             const request = this.requests[i];
             if (this.activeReservationRequestStillValid(request)) {
@@ -83,6 +88,7 @@ export class ReservationRequestManager {
 
     public async requestReservation(request: ActiveReservationRequest) {
         let slotToReserve = null;
+        let venueToReserve = null;
         for (const venue of request.venues) {
             slotToReserve = await this.findSuitableReservationRequest(
                 venue.id,
@@ -92,6 +98,7 @@ export class ReservationRequestManager {
             );
 
             if (slotToReserve) {
+                venueToReserve = venue;
                 break;
             }
         }
@@ -141,7 +148,7 @@ export class ReservationRequestManager {
                 );
                 return {
                     shouldRemoveRequest,
-                    bookedVenueId: slotToReserve.id,
+                    bookedVenueId: venueToReserve.id,
                     bookedTimeWindow: {
                         startTime: slotToReserve.startTime,
                         endTime: slotToReserve.endTime,

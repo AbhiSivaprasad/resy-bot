@@ -3,27 +3,28 @@ import { connect } from './db/manager';
 import { app } from './app';
 import { logger } from './logger';
 import { reservationManager } from './plan';
+import { getAllActiveRequests } from './db/models/user/user.statics';
 
-// read environment variables from .env file
-dotenv.config({ path: './.env.dev' });
+const start = async () => {
+    // read environment variables from .env file
+    dotenv.config({ path: './.env.dev' });
 
-// await (async () => {
-//     await reservationManager.loadActiveRequestsFromDb();
-// })();
+    // start app
+    const port = 4001;
+    logger.log(`Starting server on port ${port}`);
+    app.listen(port, () =>
+        console.log(`Express is listening at http://localhost:${port}`),
+    );
 
-// start app
-const port = 4001;
-logger.log(`Starting server on port ${port}`);
-app.listen(port, () =>
-    console.log(`Express is listening at http://localhost:${port}`),
-);
-
-// initialize db connection manager
-(async () => {
+    // initialize db connection manager
     await connect();
-})();
 
-const secondsBetweenProcessingRequests = 3;
-setInterval(() => {
-    reservationManager.requestReservations();
-}, secondsBetweenProcessingRequests * 1000);
+    const secondsBetweenProcessingRequests = 1;
+    const loadedActiveRequests = await getAllActiveRequests();
+    reservationManager.addReservationRequests(loadedActiveRequests);
+    setInterval(() => {
+        reservationManager.requestReservations();
+    }, secondsBetweenProcessingRequests * 1000);
+};
+
+start();

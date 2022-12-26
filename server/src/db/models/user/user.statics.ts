@@ -10,13 +10,25 @@ export async function getActiveRequestCountForUser(username: string) {
 }
 
 export async function getAllActiveRequests() {
-    const users = await UserModel.find().select('reservationRequests');
+    const users = await UserModel.find();
 
-    return users.map((user) => ({
-        requests: user.reservationRequests.filter(
-            (request) => request.expirationTime > new Date(),
-        ),
-    }));
+    return users
+        .map((user) =>
+            user
+                .toObject()
+                .reservationRequests.filter(
+                    (request) =>
+                        request.expirationTime > new Date() &&
+                        !request.bookedSlot,
+                )
+                .map((request) => ({
+                    ...request,
+                    keys: user.keys,
+                    nextRetryTime: new Date(),
+                    userId: user.username,
+                })),
+        )
+        .flat(1);
 }
 
 export async function addReservationRequestForUser(
