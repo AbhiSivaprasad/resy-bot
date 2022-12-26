@@ -4,4 +4,4 @@ npm run start-prod &
 
 cd ../client/
 npm install
-npm run client &
+npm run start-prod &
