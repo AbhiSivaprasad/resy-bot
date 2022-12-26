@@ -49,7 +49,8 @@ export function validateGetReservationRequests(req) {
 }
 
 export function validateDeleteReservationRequest(req) {
-    return validateRequestForRequiredParamsAndTypes(req.body, {
+    return validateRequestForRequiredParamsAndTypes(req.query, {
+        user_id: 'string',
         reservation_id: 'string',
     });
 }

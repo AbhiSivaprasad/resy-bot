@@ -159,7 +159,7 @@ export async function deleteReservationRequestEndpoint(req, res) {
         return;
     }
 
-    const { user_id, reservation_id } = req.body;
+    const { user_id, reservation_id } = req.query;
 
     const deleted = deleteReservationRequest(user_id, reservation_id);
     if (!deleted) {

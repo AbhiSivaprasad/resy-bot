@@ -44,9 +44,9 @@ export async function deleteReservationRequestForUser(
     reservationId: string,
 ) {
     const result = await UserModel.updateOne(
-        { username, 'reservationRequests.id': reservationId },
-        { $pull: { reservationRequests: { id: reservationId } } },
+        { username },
+        { $pull: { reservationRequests: { _id: reservationId } } },
     );
 
-    return result.matchedCount != 0;
+    return result.modifiedCount != 0;
 }
