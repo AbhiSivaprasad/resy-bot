@@ -4,5 +4,5 @@ files:
   - source: '/'
     destination: '/home/ec2-user'
 hooks:
-  BeforeInstall:
+  BeforeAllowTraffic:
     - location: ~/start.sh
