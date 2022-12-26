@@ -81,6 +81,7 @@ function Input(props) {
         }}
         value={value}
         disabled={props.disabled}
+        readOnly={props.readOnly}
         onFocus={() => setFocused(true)}
         onBlur={() => setTimeout(() => setFocused(false), 200)}
         className={`border-2 px-4 py-2 rounded-full w-full  }`}

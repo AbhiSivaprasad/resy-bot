@@ -21,7 +21,6 @@ function Signin() {
   let [apiKey, setApiKey] = useState("");
   let [authToken, setAuthToken] = useState("");
   let postUser = () => {
-    console.log("user id is", user.data.user_id);
     fetch(process.env.REACT_APP_SERVER_URL + "/validateKeys", {
       method: "post",
       headers: {
