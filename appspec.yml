@@ -5,5 +5,5 @@ files:
     destination: '/home/ubuntu/app'
 file_exists_behavior: OVERWRITE
 hooks:
-  BeforeAllowTraffic:
+  AfterInstall:
     - location: ~/start.sh
