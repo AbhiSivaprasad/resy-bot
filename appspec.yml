@@ -5,5 +5,5 @@ files:
     destination: '/home/ubuntu/app'
 file_exists_behavior: OVERWRITE
 hooks:
-  ApplicationStart:
-    - location: /home/ubntu/app/start.sh
+  ValidateService:
+    - location: start.sh
