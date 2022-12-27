@@ -2,10 +2,10 @@
 fuser -k 4001/tcp
 fuser -k 3000/tcp
 
-cd ~/server
+cd ~/app/server
 sudo npm install
 sudo npm run start-prod &
 
-cd ~/client
+cd ~/app/client
 sudo npm install
 sudo npm run start-prod &

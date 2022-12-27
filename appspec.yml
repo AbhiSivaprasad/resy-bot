@@ -7,3 +7,4 @@ file_exists_behavior: OVERWRITE
 hooks:
   ValidateService:
     - location: start.sh
+      runas: root
