@@ -6,4 +6,4 @@ files:
 file_exists_behavior: OVERWRITE
 hooks:
   AfterInstall:
-    - location: ~/start.sh
+    - location: start.sh
