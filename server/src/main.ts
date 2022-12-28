@@ -1,4 +1,7 @@
 import * as dotenv from 'dotenv';
+// read environment variables from .env file immediately so all imports have access to them
+dotenv.config({ path: './.env', override: false });
+
 import { connect } from './db/manager';
 import { app } from './app';
 import { logger } from './logger';
@@ -6,9 +9,6 @@ import { reservationManager } from './plan';
 import { getAllActiveRequests } from './db/models/user/user.statics';
 
 const start = async () => {
-    // read environment variables from .env file
-    dotenv.config({ path: './.env.dev' });
-
     // start app
     const port = 4001;
     logger.log(`Starting server on port ${port}`);

@@ -13,3 +13,11 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/', router);
+
+if (process.env.NODE_ENV !== 'development') {
+    app.use('/', express.static('../client/build'));
+    // match all routes and serve index.html
+    app.get('*', (req, res) => {
+        res.sendFile('index.html', { root: '../client/build' });
+    });
+}
