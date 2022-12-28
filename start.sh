@@ -1,5 +1,5 @@
 # kill existing server process by the port it listens to
-fuser -k 4001/tcp
+sudo fuser -k 4001/tcp
 
 cd /home/ubuntu/app/client
 sudo npm install
