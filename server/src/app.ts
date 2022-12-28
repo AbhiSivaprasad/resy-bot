@@ -16,7 +16,8 @@ app.use('/', router);
 
 if (process.env.NODE_ENV !== 'development') {
     app.use('/', express.static('../client/build'));
+    // match all routes and serve index.html
     app.get('*', (req, res) => {
-        res.sendFile('../client/build/index.html');
+        res.sendFile('index.html', { root: '../client/build' });
     });
 }
