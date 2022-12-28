@@ -67,7 +67,7 @@ function Home() {
       </div>
       <div className="fixed bottom-4 flex flex-row justify-center w-full">
         <div className="text-gray-500 font-light text-center mt-2 mb-4">
-          A project by Abhi Sivaprasad and Shaya Zarkesh
+          Abhi Sivaprasad and Shaya Zarkesh
         </div>
       </div>
     </>
