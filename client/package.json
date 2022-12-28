@@ -22,8 +22,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "REACT_APP_SERVER_URL=http://localhost:4001 react-scripts start",
+    "build": "REACT_APP_SERVER_URL=\"\" react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -49,5 +49,6 @@
     "autoprefixer": "^10.4.12",
     "postcss": "^8.4.18",
     "tailwindcss": "^3.1.8"
-  }
+  },
+  "homepage": "static"
 }

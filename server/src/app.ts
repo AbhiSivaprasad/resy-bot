@@ -10,7 +10,7 @@ import { router } from './router/router';
 
 // configure middleware
 if (process.env.NODE_ENV !== 'development') {
-    app.use('/static', express.static('../client/build'));
+    app.use('/', express.static('../client/build'));
 }
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));

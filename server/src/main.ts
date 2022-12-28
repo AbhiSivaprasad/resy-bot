@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 // read environment variables from .env file immediately so all imports have access to them
-dotenv.config({ path: './.env' });
+dotenv.config({ path: './.env', override: false });
 
 import { connect } from './db/manager';
 import { app } from './app';
