@@ -7,4 +7,4 @@ npm run build
 
 cd /home/ubuntu/app/server
 sudo npm install
-nohup sudo npm run start-prod > /dev/null 2> /dev/null < /dev/null &
+sudo npm run start-prod > /dev/null 2> /dev/null < /dev/null &
