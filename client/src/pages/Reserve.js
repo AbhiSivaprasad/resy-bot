@@ -144,7 +144,6 @@ function Reserve() {
         if (res.ok) {
           return res.json();
         } else {
-          console.log("bad sdearch");
           alert(
             "It looks like you entered your API keys incorrectly. Please go back to /siginin and try again."
           );

@@ -45,7 +45,7 @@ function App() {
           }
         });
     } else {
-      //navigate("/");
+      navigate("/");
     }
   }, []);
 

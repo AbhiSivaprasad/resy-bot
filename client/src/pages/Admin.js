@@ -26,8 +26,7 @@ function Admin() {
     )
       .then((res) => {
         if (!res.ok) {
-          console.log("error", res);
-          //navigate("/reservations");
+          navigate("/");
         } else {
           return res.json();
         }
@@ -42,7 +41,7 @@ function Admin() {
       },
       body: JSON.stringify({
         user_id: userToAdd,
-        adminUsername: user,
+        adminUsername: user.data.user_id,
         concurrentLimit: 10,
       }),
     })
@@ -61,7 +60,7 @@ function Admin() {
       },
       body: JSON.stringify({
         user_id: userToDelete,
-        adminUsername: user,
+        adminUsername: user.data.user_id,
       }),
     })
       .then((res) => res.text())
