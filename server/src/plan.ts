@@ -53,7 +53,6 @@ export class ReservationRequestManager {
 
                     if (shouldRemoveRequest) {
                         // remove request from queue
-                        logger.log(`successful reservation for ${request._id}`);
                         this.requests.splice(i, 1);
                     }
 
@@ -76,8 +75,8 @@ export class ReservationRequestManager {
                 }
             } else {
                 // remove request if reservation was unsuccessful but expiration time has passed
-                logger.log(
-                    `expiration time passed, removing request ${request._id}`,
+                await logger.log(
+                    `[Reservation] expiration time passed, removing request ${request._id}`,
                 );
                 this.requests.splice(i, 1);
             }
@@ -121,6 +120,9 @@ export class ReservationRequestManager {
                         shouldRemoveRequest = true;
                         break;
                     case 'API_KEYS_INVALID':
+                        shouldRemoveRequest = false;
+                        break;
+                    default:
                         shouldRemoveRequest = false;
                         break;
                 }

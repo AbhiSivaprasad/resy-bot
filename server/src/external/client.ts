@@ -8,6 +8,7 @@ import {
 import { logger } from '../logger';
 import { GeoLocation, Slot, SlotBookingInfo } from './types';
 import { Err, Ok, Result } from 'ts-results';
+import { prettyprint } from '../util';
 
 // get available slots for a venue
 export const getSlots = async (
@@ -22,7 +23,10 @@ export const getSlots = async (
     }
     let slots = response.val?.results?.venues[0]?.slots;
     if (!slots) {
-        logger.log('Slots not found in API response');
+        const metadata = { venueId, date, partySize, keys };
+        await logger.error(
+            `Slots not found in API response for ${prettyprint(metadata)}`,
+        );
         slots = [];
     }
 

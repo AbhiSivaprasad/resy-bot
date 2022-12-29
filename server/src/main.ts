@@ -11,7 +11,7 @@ import { getAllActiveRequests } from './db/models/user/user.statics';
 const start = async () => {
     // start app
     const port = 4001;
-    logger.log(`Starting server on port ${port}`);
+    await logger.log(`Starting server on port ${port}`);
     app.listen(port, () =>
         console.log(`Express is listening at http://localhost:${port}`),
     );
