@@ -8,3 +8,4 @@ npm run build
 cd /home/ubuntu/app/server
 sudo npm install
 nohup sudo npm run start-prod &
+exit
