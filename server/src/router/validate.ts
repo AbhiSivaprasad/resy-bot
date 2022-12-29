@@ -1,5 +1,11 @@
 import { Err, Ok } from 'ts-results';
 
+export function validateGetAllUsers(req) {
+    return validateRequestForRequiredParamsAndTypes(req.query, {
+        adminUsername: 'string',
+    });
+}
+
 export function validateGetUser(req) {
     return validateRequestForRequiredParamsAndTypes(req.query, {
         user_id: 'string',
@@ -8,6 +14,7 @@ export function validateGetUser(req) {
 
 export function validatePostUser(req) {
     return validateRequestForRequiredParamsAndTypes(req.body, {
+        adminUsername: 'string',
         user_id: 'string',
         concurrentLimit: 'number',
     });

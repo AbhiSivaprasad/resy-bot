@@ -3,7 +3,7 @@ import Button from "./Button";
 function Popup(props) {
   return (
     <div
-      className="fixed z-10 w-screen h-screen bg-gray-300 opacity-90 flex items-center justify-center"
+      className="absolute inset-0 z-10 w-screen h-screen bg-gray-300 opacity-90 flex items-center justify-center"
       onClick={props.onCancel}
     >
       <div className="opacity-100 w-72 h-60 bg-white rounded-xl flex flex-col space-between">

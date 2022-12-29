@@ -25,20 +25,28 @@ export async function getUser(username: string) {
     );
 }
 
-export async function postUser(username: string, concurrentLimit: string) {
+export async function postUser(
+    adminUsername: string,
+    username: string,
+    concurrentLimit: string,
+) {
+    const user = await UserModel.findOne({ username: adminUsername });
+    if (!user.admin) {
+        return Err('USER_NOT_ADMIN');
+    }
     try {
         const user = await UserModel.create({
             username: username,
             concurrentLimit: concurrentLimit,
         });
 
-        return {
+        return Ok({
             user_id: user.username,
             concurrentLimit: user.concurrentLimit,
             keys: user.keys,
-        };
+        });
     } catch {
-        return null;
+        return Err('POST_FAILED');
     }
 }
 
@@ -61,10 +69,17 @@ export async function deleteUser(username: string) {
     return result.deletedCount != 0;
 }
 
-export async function getAllUsers() {
+export async function getAllUsers(adminUsername: string) {
+    const user = await UserModel.findOne({ username: adminUsername });
+    if (!user) {
+        return Err('USER_NOT_FOUND');
+    }
+    if (!user.admin) {
+        return Err('USER_NOT_ADMIN');
+    }
     const users = await UserModel.find({}).select('username');
     const userIds = users.map((user) => user.username);
-    return userIds;
+    return Ok(userIds);
 }
 
 export async function getSearch(

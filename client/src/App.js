@@ -37,7 +37,9 @@ function App() {
         .then((data) => {
           setUser({ ...user, data });
           if (!data.keys?.apiKey || !data.keys?.authToken) {
-            navigate("/signin");
+            if (window.location.pathname != "/swan") {
+              navigate("/signin");
+            }
           } else if (window.location.pathname == "/") {
             navigate("/reservations");
           }
@@ -46,6 +48,7 @@ function App() {
       //navigate("/");
     }
   }, []);
+
   return (
     <UserContext.Provider value={[user, setUser]}>
       <Nav />

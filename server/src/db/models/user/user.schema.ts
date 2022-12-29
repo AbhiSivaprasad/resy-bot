@@ -58,6 +58,10 @@ const UserSchema = new Schema({
         type: Number,
         required: true,
     },
+    admin: {
+        type: Boolean,
+        required: false,
+    },
     reservationRequests: [ReservationRequestSchema],
 });
 

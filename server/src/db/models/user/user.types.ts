@@ -6,6 +6,7 @@ export interface IUser {
     keys: ResyKeys;
     concurrentLimit: number;
     reservationRequests: IReservationRequest[];
+    admin: boolean;
 }
 
 export interface IReservationRequest {

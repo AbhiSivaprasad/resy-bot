@@ -20,9 +20,15 @@ code {
   @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-600 cursor-pointer;
 }
 
+code {
+  @apply text-red-600 bg-gray-300 p-1 rounded-md text-sm;
+}
+
 .rmdp-container {
   flex-grow: 1;
 }
+
+/* FOR DETAILED TIME PICKER WIDGET */
 
 .table-drag-select {
   /* Stretch horizontally to fill parent */
@@ -75,8 +81,4 @@ code {
 .table-drag-select td.cell-being-selected {
   /* This is the blue color you see when you select text with the cursor */
   background-color: #3f83d5;
-}
-
-code {
-  @apply text-red-600 bg-gray-300 p-1 rounded-md text-sm;
 }

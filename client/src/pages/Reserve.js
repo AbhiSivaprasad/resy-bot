@@ -74,12 +74,8 @@ function Reserve() {
   let [dates, setDates] = useState([]);
   let [detailedRanges, setDetailedRanges] = useState([]);
   let [venues, setVenues] = useState([]);
-  // let [name, setName] = useState("");
-  // let [email, setEmail] = useState("");
-
   let [isDetailedPickerVisible, setIsDetailedPickerVisible] = useState(false);
   let [isBasicPickerVisible, setIsBasicPickerVisible] = useState(true);
-
   let [venueSearchResults, setVenueSearchResults] = useState([]);
   let [venueSearchQuery, setVenueSearchQuery] = useState("");
   const [user, setUser] = useContext(UserContext);
@@ -119,8 +115,6 @@ function Reserve() {
     setDetailedRanges([]);
     setIsBasicPickerVisible(true);
   }, [isDetailedPickerVisible]);
-
-  useEffect(() => {});
 
   useEffect(() => navigator.geolocation.getCurrentPosition(setLocation), []);
 
@@ -203,6 +197,23 @@ function Reserve() {
   //     )
   //   );
   // }
+  //
+  // let isCollapsible = (ranges) => {
+  //   if (ranges.length == 0) return true;
+  //   console.log(ranges[0]);
+  //   let [start, end] = ranges[0];
+  //   let start_ofday = format(start, "HH:mm");
+  //   let end_ofday = format(end, "HH:mm");
+  //   for (let range of ranges) {
+  //     if (
+  //       format(range[0], "HH:mm") != start_ofday ||
+  //       format(range[1], "HH:mm") != end_ofday
+  //     ) {
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // };
 
   let reserve = () => {
     setIsReservationLoading(true);
@@ -241,23 +252,6 @@ function Reserve() {
       }
     });
   };
-
-  // let isCollapsible = (ranges) => {
-  //   if (ranges.length == 0) return true;
-  //   console.log(ranges[0]);
-  //   let [start, end] = ranges[0];
-  //   let start_ofday = format(start, "HH:mm");
-  //   let end_ofday = format(end, "HH:mm");
-  //   for (let range of ranges) {
-  //     if (
-  //       format(range[0], "HH:mm") != start_ofday ||
-  //       format(range[1], "HH:mm") != end_ofday
-  //     ) {
-  //       return false;
-  //     }
-  //   }
-  //   return true;
-  // };
 
   let [formComplete, setFormComplete] = useState(false);
   let [isReservationLoading, setIsReservationLoading] = useState(false);

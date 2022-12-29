@@ -21,6 +21,7 @@ import {
     validatePutUser,
     validatePostReservationRequestEndpoint,
     validatePostValidateKeysEndpoint,
+    validateGetAllUsers,
 } from './validate';
 
 export async function getUserEndpoint(req, res) {
@@ -45,8 +46,8 @@ export async function postUserEndpoint(req, res) {
         return;
     }
 
-    const { user_id, concurrentLimit } = req.body;
-    const user = await postUser(user_id, concurrentLimit);
+    const { adminUsername, user_id, concurrentLimit } = req.body;
+    const user = await postUser(adminUsername, user_id, concurrentLimit);
     if (!user) {
         // TODO: this is a catch all error
         res.status(404).send('User already exists');
@@ -131,8 +132,21 @@ export async function postValidateKeysEndpoint(req, res) {
 }
 
 export async function getAllUsersEndpoint(req, res) {
-    const userIds = await getAllUsers();
-    res.status(200).send(userIds);
+    const result = validateGetAllUsers(req);
+    if (result.err) {
+        res.status(400).send(result.val);
+        return;
+    }
+
+    const { adminUsername } = req.query;
+
+    const userIds = await getAllUsers(adminUsername);
+    if (userIds.err) {
+        res.status(404).send(userIds.val);
+        return;
+    }
+
+    res.status(200).send(userIds.val);
 }
 
 export async function getReservationRequestsEndpoint(req, res) {
