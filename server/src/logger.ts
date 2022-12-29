@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node';
 
 export class Logger {
-    init = async () => {
+    async init() {
         if (process.env.NODE_ENV === 'development') {
             return;
         }
@@ -15,7 +15,7 @@ export class Logger {
             // We recommend adjusting this value in production
             tracesSampleRate: 1.0,
         });
-    };
+    }
 
     async log(message) {
         if (process.env.NODE_ENV === 'development') {

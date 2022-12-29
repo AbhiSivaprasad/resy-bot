@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { UserModel } from './db/models/user/user.model';
 import { IReservationRequest, ITimeWindow } from './db/models/user/user.types';
 import { ResyKeys } from './external/api';
@@ -112,26 +113,23 @@ export class ReservationRequestManager {
                 switch (reservationResponse.val) {
                     case 'SLOT_ALREADY_BOOKED':
                         shouldRemoveRequest = true;
-                        logger.log(
-                            `Rebooking booked slot. Request: ${
-                                request._id
-                            }\nSlot to reserve ${prettyprint(slotToReserve)}`,
-                        );
+                        break;
                     case 'FAILED_TO_BOOK_SLOT':
                         shouldRemoveRequest = false;
-                        logger.log(
-                            `Snipe failed. Request: ${
-                                request._id
-                            }\nSlot to reserve: ${prettyprint(slotToReserve)}`,
-                        );
+                        break;
                     case 'PAYMENT_REQUIRED':
                         shouldRemoveRequest = true;
-                        logger.log(
-                            `Payment required. Removing request: ${
-                                request._id
-                            }\nSlot to reserve: ${prettyprint(slotToReserve)}`,
-                        );
+                        break;
+                    case 'API_KEYS_INVALID':
+                        shouldRemoveRequest = false;
+                        break;
                 }
+
+                await this.logReservationResponse(
+                    request._id,
+                    reservationResponse.val,
+                    slotToReserve,
+                );
 
                 return {
                     shouldRemoveRequest,
@@ -141,10 +139,10 @@ export class ReservationRequestManager {
                 };
             } else {
                 shouldRemoveRequest = true;
-                logger.log(
-                    `Snipe successful. Request: ${prettyprint(
-                        request,
-                    )}\n\nSlot to reserve: ${prettyprint(slotToReserve)}`,
+                await this.logReservationResponse(
+                    request._id,
+                    'SLOT_BOOKED_SUCCESSFULLY',
+                    slotToReserve,
                 );
                 return {
                     shouldRemoveRequest,
@@ -246,6 +244,18 @@ export class ReservationRequestManager {
                     },
                 },
             },
+        );
+    }
+
+    private async logReservationResponse(
+        requestId: ObjectId,
+        message: string,
+        slotToReserve: Slot,
+    ) {
+        await logger.log(
+            `[Reservation] ${message}. Request: ${requestId}\nSlot to reserve: ${prettyprint(
+                slotToReserve,
+            )}`,
         );
     }
 }
