@@ -76,7 +76,7 @@ function Signin() {
     <div className="flex flex-col items-center">
       <div className="container max-w-4xl flex flex-col items-center px-8">
         <div className="text-2xl my-4 text-center">
-          Why did Shaya/Abhi send me a random link to this app?
+          Why did I get a random link to this app?
         </div>
         <div>
           <p>
