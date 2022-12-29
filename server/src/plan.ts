@@ -124,6 +124,13 @@ export class ReservationRequestManager {
                                 request._id
                             }\nSlot to reserve: ${prettyprint(slotToReserve)}`,
                         );
+                    case 'PAYMENT_REQUIRED':
+                        shouldRemoveRequest = true;
+                        logger.log(
+                            `Payment required. Removing request: ${
+                                request._id
+                            }\nSlot to reserve: ${prettyprint(slotToReserve)}`,
+                        );
                 }
 
                 return {
