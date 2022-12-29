@@ -152,7 +152,7 @@ function Reserve() {
         } else {
           console.log("bad sdearch");
           alert(
-            "It looks like you entered your API keys incorrectly. Please go back to /signup and try again."
+            "It looks like you entered your API keys incorrectly. Please go back to /siginin and try again."
           );
         }
       })
@@ -287,7 +287,7 @@ function Reserve() {
   return (
     <div className="flex flex-col items-center">
       <div className="container px-4 lg:px-8 flex flex-col items-center">
-        <div className="text-3xl font-semibold my-8 text-center">
+        <div className="my-4 text-xl md:text-3xl font-semibold md:mt-4 md:mb-8 text-center">
           Let's find you a reservation...
         </div>
         <ExpandableSection
@@ -356,7 +356,7 @@ function Reserve() {
         >
           {isDetailedPickerVisible && (
             <div>
-              <div className="h-[calc(100vh_-_30rem)]">
+              <div className="h-[calc(max(30rem,100vh_-_37rem))]">
                 <DetailedTimePicker
                   onChange={setDetailedRanges}
                   selectedRanges={detailedRanges}
@@ -417,7 +417,7 @@ function Reserve() {
                   numberOfMonths={1}
                 ></DatePicker>
               </div>
-              <div className="flex flex-row justify-end text-right">
+              <div className="flex flex-row justify-center lg:justify-end text-right">
                 <Button
                   className="text-sm mt-1"
                   color="red"
