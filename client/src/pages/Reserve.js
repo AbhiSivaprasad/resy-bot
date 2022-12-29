@@ -205,6 +205,7 @@ function Reserve() {
   // }
 
   let reserve = () => {
+    setIsReservationLoading(true);
     let timeWindows = isBasicPickerVisible
       ? dates.map((date) => ({
           startTime: toJsDate(date, startTime.value),
@@ -230,6 +231,7 @@ function Reserve() {
         timeWindows,
       }),
     }).then((res) => {
+      setIsReservationLoading(false);
       if (res.ok) {
         navigate("/reservations");
       } else {
@@ -258,6 +260,7 @@ function Reserve() {
   // };
 
   let [formComplete, setFormComplete] = useState(false);
+  let [isReservationLoading, setIsReservationLoading] = useState(false);
 
   useEffect(() => {
     let basicComplete =
@@ -393,7 +396,7 @@ function Reserve() {
                     options={TIME_OPTIONS}
                   ></Input>
                 </div>
-                <div className="whitespace-nowrap">on these days:</div>
+                <div className="whitespace-nowrap">on one of these days:</div>
                 <div></div>
                 <DatePicker
                   defaultValue={new Date()}
@@ -446,6 +449,7 @@ function Reserve() {
         </ExpandableSection> */}
         <Button
           disabled={!formComplete}
+          loading={isReservationLoading}
           onClick={reserve}
           className="my-8"
           buttonclasses="rounded-full px-8 py-4 font-bold"

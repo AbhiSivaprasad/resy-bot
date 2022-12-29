@@ -76,6 +76,30 @@ function Signin() {
     <div className="flex flex-col items-center">
       <div className="container max-w-4xl flex flex-col items-center px-8">
         <div className="text-2xl my-4 text-center">
+          Why did Shaya/Abhi send me a random link to this app?
+        </div>
+        <div>
+          <p>
+            Have you come to expect dissapointment when searching for a
+            restaurant reservation anything less than{" "}
+            <span className="italic">fourteen fucking days</span> in advance?
+            Well we have.
+            <br></br> <br></br> Resy-bot lets you put in "reservation requests"
+            that specify parameters for party size, potential restaurants of
+            interests, and time windows of availability. By pinging the Resy
+            API, we'll find you a res as soon as someone cancels!
+          </p>
+          <br></br>
+          <p>
+            Happy holidays!<br></br> -Shaya and Abhi
+          </p>
+
+          <p className="text-sm mt-2">
+            PS: For your credit card's safety, it'll only work on restaurants
+            with free cancellation.
+          </p>
+        </div>
+        <div className="text-2xl my-4 mt-8 text-center">
           Just some setup for the first time.
         </div>
         <div>
@@ -84,7 +108,7 @@ function Signin() {
             <a className="a" target={"_blank"} href="https://resy.com">
               https://resy.com
             </a>{" "}
-            and make sure you're signed in.
+            on Chrome, and make sure you're signed in.
           </Step>
           <Step num={2}>
             Right click, click "Inspect", and go to the "network" tab.
