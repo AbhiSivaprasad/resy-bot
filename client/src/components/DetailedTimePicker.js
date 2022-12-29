@@ -125,7 +125,7 @@ function DetailedTimePicker(props) {
 
   return (
     <div className="h-full">
-      <div className="w-full flex flex-row items-center justify-between my-4 px-8">
+      <div className="w-full flex flex-row items-center justify-between mt-2 mb-4 px-2 md:px-8 space-x-4">
         <div>
           <FontAwesomeIcon
             icon={faCircleArrowLeft}
@@ -135,11 +135,13 @@ function DetailedTimePicker(props) {
           ></FontAwesomeIcon>
         </div>
         <div className="flex flex-row items-center space-x-8">
-          <div className="text-lg">Week of {format(weekStart, "LLLL d")}</div>
+          <div className="text-lg text-center md:border-b-2 md:border-red-500 md:px-2 md:pb-1">
+            Week of {format(weekStart, "LLLL d")}
+          </div>
           {selectedRanges.length > 0 && (
             <div className="flex flex-row justify-center">
               <a
-                className="a"
+                className="a text-center"
                 onClick={() => {
                   setSelectedRanges([]);
                 }}
@@ -163,9 +165,9 @@ function DetailedTimePicker(props) {
         <tr>
           <td></td>
           {visibleDays.map((day) => (
-            <td disabled className="border-b">
+            <td key={day} disabled className="border-b text-xs sm:text-base">
               <div className="text-center">{format(day, "E")}</div>
-              <div style={{ lineHeight: "2rem" }} className="text-center">
+              <div style={{ lineHeight: "1.5rem" }} className="text-center">
                 {format(day, "L/d")}
               </div>
             </td>
@@ -183,8 +185,10 @@ function DetailedTimePicker(props) {
         >
           {hourOptions.map((hour) =>
             minuteOptions.map((minute) => (
-              <tr>
-                <td disabled>{minute == 0 ? hour : ""}</td>
+              <tr key={hour + "_" + minute}>
+                <td className="text-xs md:text-base" disabled>
+                  {minute == 0 ? hour : ""}
+                </td>
                 {[...Array(NUM_DAYS_VISIBLE)].map((i) => (
                   <td
                     className={`border-x ${minute == 0 && "border-t"} ${

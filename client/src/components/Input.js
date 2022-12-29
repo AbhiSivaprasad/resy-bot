@@ -62,7 +62,7 @@ function Input(props) {
           className="cursor-pointer border-b hover:bg-gray-200 duration-100"
           key={item.name}
           id={"option-" + props.name + "-" + item.name}
-          onClick={() => selectResultHandler(item)}
+          onMouseDown={() => selectResultHandler(item)}
         >
           <div className="px-4 py-2">{item.name}</div>
         </div>

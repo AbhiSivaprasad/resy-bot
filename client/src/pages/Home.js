@@ -12,7 +12,11 @@ function Home() {
   let attemptSignIn = () => {
     setUsernameError("");
 
-    fetch(process.env.REACT_APP_SERVER_URL + "/user?user_id=" + username)
+    fetch(
+      process.env.REACT_APP_SERVER_URL +
+        "/user?user_id=" +
+        username.toLocaleLowerCase()
+    )
       .then((res) => {
         if (res.ok) return res.json();
         else throw new Error("Status code error :" + res.status);

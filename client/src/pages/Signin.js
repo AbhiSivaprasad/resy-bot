@@ -86,8 +86,8 @@ function Signin() {
             Well we have.
             <br></br> <br></br> Resy-bot lets you put in "reservation requests"
             that specify parameters for party size, potential restaurants of
-            interests, and time windows of availability. By pinging the Resy
-            API, we'll find you a res as soon as someone cancels!
+            interest, and time windows of availability. By pinging the Resy API,
+            we'll find you a res as soon as someone cancels!
           </p>
           <br></br>
           <p>
@@ -100,7 +100,7 @@ function Signin() {
           </p>
         </div>
         <div className="text-2xl my-4 mt-8 text-center">
-          Just some setup for the first time.
+          Just some setup for the first time (you'll need a laptop.)
         </div>
         <div>
           <Step num={1}>
