@@ -7,8 +7,10 @@ const app = express();
 export { app };
 
 import { router } from './router/router';
+import { Sentry } from './sentry';
 
 // configure middleware
+app.use(Sentry.Handlers.requestHandler());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -21,3 +23,6 @@ if (process.env.NODE_ENV !== 'development') {
         res.sendFile('index.html', { root: '../client/build' });
     });
 }
+
+// error middleware should be after controllers
+app.use(Sentry.Handlers.errorHandler());

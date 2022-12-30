@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import qs from 'qs';
 import { Err, Ok } from 'ts-results';
+import { logger } from '../logger';
 import { GeoLocation } from './types';
 
 export const RESY_API_URL = 'https://api.resy.com/';
@@ -34,6 +35,7 @@ export const getVenueDetails = async (
         const response: AxiosResponse = await axios(config);
         return Ok(response.data);
     } catch (error) {
+        logger.captureException(error);
         return Err('API_KEYS_INVALID');
     }
 };
@@ -69,6 +71,7 @@ export const getSlotDetails = async (
         const response = await axios(config);
         return Ok(response.data);
     } catch (error) {
+        logger.captureException(error);
         return Err('API_KEYS_INVALID');
     }
 };
@@ -96,7 +99,7 @@ export const bookSlot = async (bookToken: string, keys: ResyKeys) => {
         const response = await axios(config).catch((error) => error.response);
         return Ok(response.data);
     } catch (error) {
-        console.log(error);
+        logger.captureException(error);
 
         if (error.message && error.message === 'Payment Required') {
             return Err('PAYMENT_REQUIRED');
@@ -143,6 +146,7 @@ export const search = async (
         const response = await axios(config);
         return Ok(response.data);
     } catch (error) {
+        logger.captureException(error);
         return Err('API_KEYS_INVALID');
     }
 };

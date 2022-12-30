@@ -12,14 +12,18 @@ const start = async () => {
     // start app
     const port = 4001;
     await logger.log(`Starting server on port ${port}`);
-    app.listen(port, () =>
-        console.log(`Express is listening at http://localhost:${port}`),
+    app.listen(
+        port,
+        async () =>
+            await logger.log(
+                `Express is listening at http://localhost:${port}`,
+            ),
     );
 
     // initialize db connection manager
     await connect();
 
-    const secondsBetweenProcessingRequests = 1;
+    const secondsBetweenProcessingRequests = 5;
     const loadedActiveRequests = await getAllActiveRequests();
     reservationManager.addReservationRequests(loadedActiveRequests);
     setInterval(() => {

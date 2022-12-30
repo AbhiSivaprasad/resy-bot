@@ -156,14 +156,19 @@ export class ReservationRequestManager {
                     bookedPartySize: slotToReserve.size,
                 };
             }
+        } else {
+            await this.logReservationResponse(
+                request._id,
+                'NO_SLOTS_FOUND',
+                null,
+            );
+            return {
+                shouldRemoveRequest: false,
+                bookedVenueId: null,
+                bookedTimeWindow: null,
+                bookedPartySize: null,
+            };
         }
-
-        return {
-            shouldRemoveRequest: false,
-            bookedVenueId: null,
-            bookedTimeWindow: null,
-            bookedPartySize: null,
-        };
     }
 
     private activeReservationRequestStillValid(
